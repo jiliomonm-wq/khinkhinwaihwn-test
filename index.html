@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HADAKA Style Portfolio | Creative Archive</title>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --card-bg: #141414;
+      --text: #f5f5f5;
+      --text-muted: #888888;
+      --accent: #ff2d55;
+      --border: rgba(255, 255, 255, 0.1);
+      --font-base: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", "Hiragino Sans", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-base);
+      line-height: 1.6;
+      letter-spacing: 0.03em;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(13, 13, 13, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .scroll-counter {
+      font-family: monospace;
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .hero {
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 3rem 6rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      font-family: monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 7.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+    }
+
+    .hero-description {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 650px;
+    }
+
+    .works-section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 4rem 3rem 10rem;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 3rem 2rem;
+    }
+
+    .work-item {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .work-item.col-12 { grid-column: span 12; }
+    .work-item.col-7  { grid-column: span 7; }
+    .work-item.col-5  { grid-column: span 5; }
+    .work-item.col-6  { grid-column: span 6; }
+    .work-item.col-4  { grid-column: span 4; }
+
+    .image-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+
+    .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+      filter: grayscale(15%);
+    }
+
+    .image-wrapper:hover img {
+      transform: scale(1.04);
+      filter: grayscale(0%);
+    }
+
+    .aspect-landscape { aspect-ratio: 16 / 9; }
+    .aspect-tall      { aspect-ratio: 9 / 16; max-height: 700px; }
+    .aspect-square    { aspect-ratio: 1 / 1; }
+    .aspect-poster    { aspect-ratio: 3 / 4; }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 0.75rem;
+    }
+
+    .meta-id {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    .meta-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .meta-tag {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 4rem 3rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 900px) {
+      header, .hero, .works-section, footer {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      .work-item.col-7,
+      .work-item.col-5,
+      .work-item.col-6,
+      .work-item.col-4 {
+        grid-column: span 12;
+      }
+      .aspect-tall {
+        max-height: 520px;
+      }
+      footer {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">HADAKA <span>/</span> ARCHIVE</div>
+    <div class="scroll-counter" id="scrollIndicator">000%</div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">00 — RAW VISUALS</div>
+    <h1 class="hero-title">すべてを、<br>裸に。</h1>
+    <p class="hero-description">
+      Stripping away the noise. High-contrast visual experimentation across character art, advertising concept, editorial direction, and nature.
+    </p>
+  </section>
+
+  <main class="works-section">
+    <div class="section-header">
+      <div class="section-title">Selected Works (07)</div>
+      <div style="font-family: monospace; color: var(--text-muted);">INDEX 2024–2026</div>
+    </div>
+
+    <div class="works-grid">
+
+      <article class="work-item col-12">
+        <div class="image-wrapper aspect-landscape">
+          <img src="1000039449.jpg" alt="Deep Forest Sunlight Landscape" loading="lazy">
+        </div>
+        <div class="meta">
+          <div>
+            <span class="meta-id">01 / WORLD</span>
+            <div class="meta-title">Untamed Canopy</div>
+          </div>
+          <span class="meta-tag">Atmospheric Art</span>
+        </div>
+      </article>
+
+      <article class="work-item col-5">
+        <div class="image-wrapper aspect-tall">
+          <img src="1000039069.jpg" alt="Horned Mask Wrapped in Red Tape" loading="lazy">
+        </div>
+        <div class="meta">
+          <div>
+            <span class="meta-id">02 / AVANT-GARDE</span>
+            <div class="meta-title">The Ritual Tape</div>
+          </div>
+          <span class="meta-tag">Art Direction</span>
+        </div>
+      </article>
+
+      <article class="work-item col-7">
+        <div class="image-wrapper aspect-poster">
+          <img src="1000039071.jpg" alt="Focus Eagle Head Illustration" loading="lazy">
+        </div>
+        <div class="meta">
+          <div>
+            <span class="meta-id">03 / DETAIL</span>
+            <div class="meta-title">The Art of Noticing</div>
+          </div>
+          <span class="meta-tag">Typography & Illustration</span>
+        </div>
+      </article>
+
+      <article class="work-item col-6">
+        <div class="image-wrapper aspect-poster">
+          <img src="1000039075.jpg" alt="Sardor Skydiving Commercial" loading="lazy">
+        </div>
+        <div class="meta">
+          <div>
+            <span class="meta-id">04 / COMMERCIAL</span>
+            <div class="meta-title">Sardor Adventure</div>
+          </div>
+          <span class="meta-tag">Packaging & Campaign</span>
+        </div>
+      </article>
+
+      <article class="work-item col-6">
+        <div class="image-wrapper aspect-poster">
+          <img src="1000039077.jpg" alt="Designers are not Design Machines" loading="lazy">
+        </div>
+        <div class="meta">
+          <div>
+            <span class="meta-id">05 / CONCEPT</span>
+            <div class="meta-title">Working Under Pressure</div>
+          </div>
+          <span class="meta-tag">Editorial Poster</span>
+        </div>
+      </article>
+
+      <article class="work-item col-6">
+        <div class="image-wrapper aspect-square">
+          <img src="1000039042.jpg" alt="Portrait with Glasses" loading="lazy">
+        </div>
+        <div class="meta">
+          <div>
+            <span class="meta-id">06 / IDENTITY</span>
+            <div class="meta-title">Gaze & Silence</div>
+          </div>
+          <span class="meta-tag">Portrait Photography</span>
+        </div>
+      </article>
+
+      <article class="work-item col-6">
+        <div class="image-wrapper aspect-square">
+          <img src="1000038930.png" alt="Anime Illustration Couple" loading="lazy">
+        </div>
+        <div class="meta">
+          <div>
+            <span class="meta-id">07 / NARRATIVE</span>
+            <div class="meta-title">Duo Portrait</div>
+          </div>
+          <span class="meta-tag">Digital Manga Art</span>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <footer>
+    <div>&copy; HADAKA CONCEPT ARCHIVE — ALL RIGHTS RESERVED.</div>
+    <div>TOKYO / MANDALAY</div>
+  </footer>
+
+  <script>
+    const counter = document.getElementById('scrollIndicator');
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = height > 0 ? Math.round((scrollY / height) * 100) : 0;
+      counter.textContent = String(pct).padStart(3, '0') + '%';
+    });
+  </script>
+</body>
+</html>
