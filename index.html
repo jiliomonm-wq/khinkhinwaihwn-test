@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HADAKA Mobile Experience</title>
+<title>Htet Wai Naing Test Website For Khin Khin — MMBS Version</title>
 <style>
   :root{
     --bg:#f5f5f7; --text:#050505; --muted:#999; --accent:#ff2a44;
     --font-mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-    --font-sans:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Padauk","Myanmar Text",sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{
@@ -21,20 +21,29 @@
     position:fixed; inset:0; overflow:hidden;
     perspective:1000px; z-index:1;
   }
+
+  /* ── HUD ── */
   .header-ui{
     position:fixed; top:0; left:0; width:100vw;
     padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:baseline;
-    font-family:var(--font-mono); font-size:.75rem; letter-spacing:.15em;
+    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.15em;
     z-index:50; mix-blend-mode:difference; color:#fff; pointer-events:none;
+    text-transform:uppercase;
+  }
+  .header-ui .brand{
+    font-weight:700; letter-spacing:.2em;
   }
   .footer-ui{
     position:fixed; bottom:0; left:0; width:100vw;
     padding:1.25rem 1.5rem; display:flex; justify-content:space-between;
-    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.12em;
+    font-family:var(--font-mono); font-size:.6rem; letter-spacing:.12em;
     z-index:50; color:var(--muted); pointer-events:none;
+    text-transform:uppercase;
   }
+  .footer-ui .tag{max-width:50%; line-height:1.5}
+  .footer-ui .tag.right{text-align:right; color:var(--accent)}
 
-  /* CENTERED STACK */
+  /* ── Center stack ── */
   .hero-title, .flow-item{
     position:absolute;
     top:50%; left:50%;
@@ -44,14 +53,23 @@
   }
   .hero-title{ text-align:center; width:90%; z-index:2; }
   .hero-title h1{
-    font-size:3.5rem; font-weight:900;
-    letter-spacing:-.04em; line-height:1.1; color:var(--text);
+    font-size:2.4rem; font-weight:900;
+    letter-spacing:-.03em; line-height:1.15; color:var(--text);
   }
+  .hero-title h1 .accent{color:var(--accent)}
   .hero-title span{
     display:block; font-family:var(--font-mono);
-    font-size:.75rem; letter-spacing:.25em; color:var(--muted); margin-top:1rem;
+    font-size:.7rem; letter-spacing:.25em; color:var(--muted); margin-top:1.1rem;
+    text-transform:uppercase;
+  }
+  .hero-title .mmbs{
+    display:inline-block; margin-top:.9rem;
+    font-family:var(--font-mono); font-size:.6rem; letter-spacing:.3em;
+    padding:.4rem .8rem; border:1px solid var(--text); border-radius:2px;
+    color:var(--text); text-transform:uppercase;
   }
 
+  /* ── Items ── */
   .flow-item{
     width:82vw; max-width:360px;
     display:flex; flex-direction:column; align-items:flex-start;
@@ -65,65 +83,106 @@
   }
   .caption-track{
     width:100%; margin-top:.6rem;
-    display:flex; justify-content:space-between;
-    font-family:var(--font-mono); font-size:.65rem;
-    color:var(--text); letter-spacing:.1em; opacity:.85;
+    display:flex; justify-content:space-between; gap:.5rem;
+    font-family:var(--font-mono); font-size:.6rem;
+    color:var(--text); letter-spacing:.08em; opacity:.85;
+    text-transform:uppercase;
   }
-  .caption-track .num{color:var(--accent); font-weight:bold}
+  .caption-track .num{color:var(--accent); font-weight:bold; white-space:nowrap}
+  .caption-track .label{text-align:right}
+  .caption-track .sign{
+    display:block; margin-top:.25rem; font-size:.55rem;
+    color:var(--muted); letter-spacing:.15em;
+  }
 </style>
 </head>
 <body>
 
+<!-- Top HUD -->
 <aside class="header-ui">
-  <span>HADAKA / JP</span>
+  <span class="brand">Htet Wai Naing</span>
   <span id="scrollPct">000%</span>
 </aside>
 
+<!-- Bottom HUD -->
 <footer class="footer-ui">
-  <span>0 TO WONDER</span>
-  <span>MOBILE ARCHIVE</span>
+  <span class="tag">Test Website For Khin Khin</span>
+  <span class="tag right">MMBS Version</span>
 </footer>
 
+<!-- Stage -->
 <main class="mobile-stage">
+
+  <!-- HERO -->
   <div class="hero-title" id="heroElement">
-    <h1>すべてを、<br>裸に。</h1>
-    <span>SCROLL TO STRIP</span>
+    <h1>Htet Wai Naing<br><span class="accent">For Khin Khin</span></h1>
+    <span>Scroll To Explore</span>
+    <span class="mmbs">MMBS Version</span>
   </div>
 
+  <!-- 01 -->
   <div class="flow-item" data-offset-x="-5" data-rotate="-3">
-    <img src="1.jpg" alt="" loading="eager">
-    <div class="caption-track"><span class="num">01 / WORLD</span><span>CANOPY LIGHT</span></div>
+    <img src="1.jpg" alt="Canopy Light" loading="eager">
+    <div class="caption-track">
+      <span class="num">01 / World</span>
+      <span class="label">Canopy Light<span class="sign">Htet Wai Naing · MMBS</span></span>
+    </div>
   </div>
 
+  <!-- 02 -->
   <div class="flow-item" data-offset-x="5" data-rotate="2.5">
-    <img src="2.jpg" alt="" loading="lazy">
-    <div class="caption-track"><span class="num">02 / ART</span><span>RITUAL TAPE</span></div>
+    <img src="2.jpg" alt="Ritual Tape" loading="lazy">
+    <div class="caption-track">
+      <span class="num">02 / Art</span>
+      <span class="label">Ritual Tape<span class="sign">Htet Wai Naing · MMBS</span></span>
+    </div>
   </div>
 
+  <!-- 03 -->
   <div class="flow-item" data-offset-x="-6" data-rotate="-2">
-    <img src="3.jpg" alt="" loading="lazy">
-    <div class="caption-track"><span class="num">03 / VISION</span><span>NOTICING BEAUTY</span></div>
+    <img src="3.jpg" alt="Noticing Beauty" loading="lazy">
+    <div class="caption-track">
+      <span class="num">03 / Vision</span>
+      <span class="label">Noticing Beauty<span class="sign">Htet Wai Naing · MMBS</span></span>
+    </div>
   </div>
 
+  <!-- 04 -->
   <div class="flow-item" data-offset-x="4" data-rotate="3">
-    <img src="4.jpg" alt="" loading="lazy">
-    <div class="caption-track"><span class="num">04 / COMMERCIAL</span><span>SARDOR FREEFALL</span></div>
+    <img src="4.jpg" alt="Sardor Freefall" loading="lazy">
+    <div class="caption-track">
+      <span class="num">04 / Commercial</span>
+      <span class="label">Sardor Freefall<span class="sign">Htet Wai Naing · MMBS</span></span>
+    </div>
   </div>
 
+  <!-- 05 -->
   <div class="flow-item" data-offset-x="-5" data-rotate="-2.5">
-    <img src="5.jpg" alt="" loading="lazy">
-    <div class="caption-track"><span class="num">05 / EXPRESSION</span><span>DESIGN MACHINE</span></div>
+    <img src="5.jpg" alt="Design Machine" loading="lazy">
+    <div class="caption-track">
+      <span class="num">05 / Expression</span>
+      <span class="label">Design Machine<span class="sign">Htet Wai Naing · MMBS</span></span>
+    </div>
   </div>
 
+  <!-- 06 -->
   <div class="flow-item" data-offset-x="4" data-rotate="2">
-    <img src="6.jpg" alt="" loading="lazy">
-    <div class="caption-track"><span class="num">06 / IDENTITY</span><span>RAW PORTRAIT</span></div>
+    <img src="6.jpg" alt="Raw Portrait" loading="lazy">
+    <div class="caption-track">
+      <span class="num">06 / Identity</span>
+      <span class="label">Raw Portrait<span class="sign">Htet Wai Naing · MMBS</span></span>
+    </div>
   </div>
 
+  <!-- 07 -->
   <div class="flow-item" data-offset-x="0" data-rotate="0">
-    <img src="7.png" alt="" loading="lazy">
-    <div class="caption-track"><span class="num">07 / NARRATIVE</span><span>DUO STUDY</span></div>
+    <img src="7.png" alt="Duo Study" loading="lazy">
+    <div class="caption-track">
+      <span class="num">07 / Narrative</span>
+      <span class="label">Duo Study<span class="sign">Htet Wai Naing · MMBS</span></span>
+    </div>
   </div>
+
 </main>
 
 <div class="scroll-container"></div>
@@ -134,18 +193,17 @@
   const hero     = document.getElementById('heroElement');
   const pctLabel = document.getElementById('scrollPct');
 
-  const total = items.length;
-  const step  = 1 / total;
-  const WINDOW = step * 1.8;   // ← 1.8x ဆိုတော့ item ၂ ခုလောက် တစ်ပြိုင်နက် မြင်ရမယ် (mix)
+  const total  = items.length;
+  const step   = 1 / total;
+  const WINDOW = step * 1.8;   // overlapping timeline (mix effect)
 
-  // Pre-parse
   const cfg = items.map(el => ({
     el,
     offX: parseFloat(el.dataset.offsetX) || 0,
     rot:  parseFloat(el.dataset.rotate)  || 0
   }));
 
-  const clamp  = (v,a,b)=>Math.min(Math.max(v,a),b);
+  const clamp   = (v,a,b)=>Math.min(Math.max(v,a),b);
   const easeOut = t=>1-Math.pow(1-t,3);
 
   let ticking = false;
@@ -153,19 +211,19 @@
   function update(){
     ticking = false;
 
-    const scrollY = window.scrollY || window.pageYOffset;
+    const scrollY   = window.scrollY || window.pageYOffset;
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = clamp(scrollY / maxScroll, 0, 1);
+    const progress  = clamp(scrollY / maxScroll, 0, 1);
 
     pctLabel.textContent = String(Math.round(progress*100)).padStart(3,'0') + '%';
 
-    /* ── HERO: fade & zoom during first 12% ── */
-    const heroExit = clamp(progress / 0.12, 0, 1);
+    /* Hero fade & zoom */
+    const heroExit  = clamp(progress / 0.12, 0, 1);
     const heroScale = 1 + easeOut(heroExit) * 1.6;
     hero.style.transform = `translate(-50%,-50%) scale(${heroScale.toFixed(3)})`;
     hero.style.opacity   = Math.max(0, 1 - heroExit * 1.2).toFixed(3);
 
-    /* ── ITEMS: travel upward + mix ── */
+    /* Items */
     for (let i = 0; i < total; i++){
       const c = cfg[i];
       const start = i * step;
@@ -182,20 +240,12 @@
 
       const localP = clamp((progress - start) / (end - start), 0, 1);
 
-      // ▲ VERTICAL TRAVEL: +75vh (below) → 0 → -75vh (above)
-      const y = 75 - localP * 150;
-
-      // ► Horizontal drift (converges slightly toward center)
-      const x = c.offX * (1 - localP * 0.6);
-
-      // ▲ SCALE: small at edges, biggest at center
-      const distFromCenter = Math.abs(localP - 0.5) * 2;   // 1 → edge, 0 → center
-      const scale = 0.55 + (1 - distFromCenter) * 0.65;    // 0.55 → 1.20
-
-      // Rotation drift
+      const y   = 75 - localP * 150;                    // +75vh → −75vh
+      const x   = c.offX * (1 - localP * 0.6);
+      const dC  = Math.abs(localP - 0.5) * 2;
+      const sc  = 0.55 + (1 - dC) * 0.65;               // 0.55 → 1.20
       const rot = c.rot * (1 - localP);
 
-      // Opacity curve
       let opacity;
       if (localP < 0.18)      opacity = easeOut(localP / 0.18);
       else if (localP > 0.78) opacity = easeOut((1 - localP) / 0.22);
@@ -206,7 +256,7 @@
       el.style.transform  =
         `translate(-50%,-50%) ` +
         `translate3d(${x.toFixed(2)}vw, ${y.toFixed(2)}vh, 0) ` +
-        `rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+        `rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
     }
   }
 
@@ -219,7 +269,7 @@
 
   window.addEventListener('scroll', onScroll, { passive:true });
   window.addEventListener('resize', onScroll);
-  update(); // initial paint
+  update();
 })();
 </script>
 </body>
