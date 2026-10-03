@@ -1,321 +1,226 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HADAKA.JP | 3D Zoom Scroll Archive</title>
-  <style>
-    :root {
-      --bg: #f8f8f8;
-      --text: #111111;
-      --muted: #888888;
-      --accent: #ff2d55;
-      --font-mono: "SF Mono", Monaco, Consolas, monospace;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Yu Gothic", "Hiragino Sans", sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HADAKA Mobile Experience</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --text:#050505; --muted:#999; --accent:#ff2a44;
+    --font-mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --font-sans:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{
+    background:var(--bg); color:var(--text); font-family:var(--font-sans);
+    width:100%; overflow-x:hidden; touch-action:pan-y; -webkit-font-smoothing:antialiased;
+  }
+  .scroll-container{position:relative; width:100vw; height:750vh}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  .mobile-stage{
+    position:fixed; inset:0; overflow:hidden;
+    perspective:1000px; z-index:1;
+  }
+  .header-ui{
+    position:fixed; top:0; left:0; width:100vw;
+    padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:baseline;
+    font-family:var(--font-mono); font-size:.75rem; letter-spacing:.15em;
+    z-index:50; mix-blend-mode:difference; color:#fff; pointer-events:none;
+  }
+  .footer-ui{
+    position:fixed; bottom:0; left:0; width:100vw;
+    padding:1.25rem 1.5rem; display:flex; justify-content:space-between;
+    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.12em;
+    z-index:50; color:var(--muted); pointer-events:none;
+  }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: var(--font-sans);
-      overflow-x: hidden;
-      /* Scroll speed နှင့် zoom space အတွက် အမြင့်ထားရှိခြင်း */
-      height: 900vh;
-    }
+  /* CENTERED STACK */
+  .hero-title, .flow-item{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    will-change:transform, opacity;
+    pointer-events:none;
+  }
+  .hero-title{ text-align:center; width:90%; z-index:2; }
+  .hero-title h1{
+    font-size:3.5rem; font-weight:900;
+    letter-spacing:-.04em; line-height:1.1; color:var(--text);
+  }
+  .hero-title span{
+    display:block; font-family:var(--font-mono);
+    font-size:.75rem; letter-spacing:.25em; color:var(--muted); margin-top:1rem;
+  }
 
-    /* Fixed Minimal UI - Corners */
-    .ui-layer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 2rem 2.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-    }
-
-    .ui-top, .ui-bottom {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-    }
-
-    .brand-title {
-      font-weight: 900;
-      color: var(--text);
-    }
-
-    .counter-display {
-      color: var(--accent);
-      font-size: 1rem;
-    }
-
-    /* 3D Viewport Stage */
-    .viewport-stage {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      perspective: 1000px;
-      perspective-origin: 50% 50%;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Center Tagline that zooms out first */
-    .hero-center {
-      position: absolute;
-      text-align: center;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-      will-change: transform, opacity;
-    }
-
-    .hero-center h1 {
-      font-size: clamp(3rem, 8vw, 7rem);
-      font-weight: 900;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-    }
-
-    .hero-center p {
-      margin-top: 1rem;
-      font-family: var(--font-mono);
-      color: var(--muted);
-      font-size: 0.9rem;
-      letter-spacing: 0.3em;
-    }
-
-    /* 3D Floating Zoom Cards */
-    .zoom-card {
-      position: absolute;
-      width: 38vw;
-      max-width: 500px;
-      background: #ffffff;
-      padding: 12px;
-      border: 1px solid rgba(0,0,0,0.08);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-      transform-style: preserve-3d;
-      will-change: transform, opacity;
-      transform: translate3d(0, 0, -5000px);
-      opacity: 0;
-      pointer-events: auto;
-    }
-
-    .zoom-card img {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
-    }
-
-    .card-label {
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .card-label .idx {
-      color: var(--accent);
-      font-weight: bold;
-    }
-
-    /* Scroll Prompt Indicator */
-    .scroll-hint {
-      position: fixed;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--muted);
-      letter-spacing: 0.2em;
-      pointer-events: none;
-      z-index: 100;
-      transition: opacity 0.4s ease;
-    }
-
-    @media (max-width: 768px) {
-      .zoom-card {
-        width: 75vw;
-      }
-      .ui-layer {
-        padding: 1.25rem 1.5rem;
-      }
-    }
-  </style>
+  .flow-item{
+    width:82vw; max-width:360px;
+    display:flex; flex-direction:column; align-items:flex-start;
+    opacity:0;
+  }
+  .flow-item img{
+    width:100%; height:auto; display:block; object-fit:cover;
+    border-radius:2px;
+    filter:contrast(102%) brightness(98%);
+    box-shadow:0 15px 35px rgba(0,0,0,.06);
+  }
+  .caption-track{
+    width:100%; margin-top:.6rem;
+    display:flex; justify-content:space-between;
+    font-family:var(--font-mono); font-size:.65rem;
+    color:var(--text); letter-spacing:.1em; opacity:.85;
+  }
+  .caption-track .num{color:var(--accent); font-weight:bold}
+</style>
 </head>
 <body>
 
-  <!-- Screen Frame UI -->
-  <div class="ui-layer">
-    <div class="ui-top">
-      <div class="brand-title">HADAKA / ARCHIVE</div>
-      <div class="counter-display" id="pctCounter">000%</div>
-    </div>
-    <div class="ui-bottom">
-      <div>0 TO WONDER</div>
-      <div>TOKYO / MANDALAY</div>
-    </div>
+<aside class="header-ui">
+  <span>HADAKA / JP</span>
+  <span id="scrollPct">000%</span>
+</aside>
+
+<footer class="footer-ui">
+  <span>0 TO WONDER</span>
+  <span>MOBILE ARCHIVE</span>
+</footer>
+
+<main class="mobile-stage">
+  <div class="hero-title" id="heroElement">
+    <h1>すべてを、<br>裸に。</h1>
+    <span>SCROLL TO STRIP</span>
   </div>
 
-  <div class="scroll-hint" id="scrollHint">SCROLL TO DIVE IN ↓</div>
-
-  <!-- 3D Stage -->
-  <div class="viewport-stage">
-
-    <!-- Center Hero Title -->
-    <div class="hero-center" id="heroText">
-      <h1>すべてを、<br>裸に。</h1>
-      <p>DEPTH EXPERIENCE / 2026</p>
-    </div>
-
-    <!-- 7 Zoom Items (ကွဲပြားသော X, Y နေရာများမှ ချဉ်းကပ်လာမည်) -->
-    <!-- 1. Jungle[span_0](start_span)[span_0](end_span) -->
-    <div class="zoom-card" data-speed="1" data-x="-5vw" data-y="0vh">
-      <img src="1.jpg" alt="Nature Deep Forest">
-      <div class="card-label">
-        <span class="idx">01 / WORLD</span>
-        <span>UNTAMED CANOPY</span>
-      </div>
-    </div>
-
-    <!-- 2. Horns Mask[span_1](start_span)[span_1](end_span) -->
-    <div class="zoom-card" data-speed="2" data-x="18vw" data-y="-8vh">
-      <img src="2.jpg" alt="Horned Mask">
-      <div class="card-label">
-        <span class="idx">02 / ART</span>
-        <span>RITUAL TAPE</span>
-      </div>
-    </div>
-
-    <!-- 3. Eagle Focus[span_2](start_span)[span_2](end_span) -->
-    <div class="zoom-card" data-speed="3" data-x="-20vw" data-y="8vh">
-      <img src="3.jpg" alt="Focus Eagle">
-      <div class="card-label">
-        <span class="idx">03 / DETAIL</span>
-        <span>THE ART OF NOTICING</span>
-      </div>
-    </div>
-
-    <!-- 4. Skydiving Snack[span_3](start_span)[span_3](end_span) -->
-    <div class="zoom-card" data-speed="4" data-x="15vw" data-y="12vh">
-      <img src="4.jpg" alt="Sardor Adventure">
-      <div class="card-label">
-        <span class="idx">04 / COMMERCIAL</span>
-        <span>EXTREME ADVENTURE</span>
-      </div>
-    </div>
-
-    <!-- 5. Cat Poster[span_4](start_span)[span_4](end_span) -->
-    <div class="zoom-card" data-speed="5" data-x="-18vw" data-y="-12vh">
-      <img src="5.jpg" alt="Design Machine">
-      <div class="card-label">
-        <span class="idx">05 / CONCEPT</span>
-        <span>UNDER PRESSURE</span>
-      </div>
-    </div>
-
-    <!-- 6. Real Portrait[span_5](start_span)[span_5](end_span) -->
-    <div class="zoom-card" data-speed="6" data-x="8vw" data-y="-4vh">
-      <img src="6.jpg" alt="Portrait">
-      <div class="card-label">
-        <span class="idx">06 / IDENTITY</span>
-        <span>RAW PORTRAIT</span>
-      </div>
-    </div>
-
-    <!-- 7. Anime Duo[span_6](start_span)[span_6](end_span) -->
-    <div class="zoom-card" data-speed="7" data-x="0vw" data-y="0vh">
-      <img src="7.png" alt="Anime Illustration">
-      <div class="card-label">
-        <span class="idx">07 / ILLUSTRATION</span>
-        <span>DUO STUDY</span>
-      </div>
-    </div>
-
+  <div class="flow-item" data-offset-x="-5" data-rotate="-3">
+    <img src="1.jpg" alt="" loading="eager">
+    <div class="caption-track"><span class="num">01 / WORLD</span><span>CANOPY LIGHT</span></div>
   </div>
 
-  <script>
-    const cards = document.querySelectorAll('.zoom-card');
-    const heroText = document.getElementById('heroText');
-    const pctCounter = document.getElementById('pctCounter');
-    const scrollHint = document.getElementById('scrollHint');
+  <div class="flow-item" data-offset-x="5" data-rotate="2.5">
+    <img src="2.jpg" alt="" loading="lazy">
+    <div class="caption-track"><span class="num">02 / ART</span><span>RITUAL TAPE</span></div>
+  </div>
 
-    // Item တစ်ခုချင်းစီအတွက် 3D Z-Depth သတ်မှတ်ချက်
-    // စုစုပေါင်း အဝေးကြီးကနေ Screen ရှေ့ကို တိုးလာစေမည်
-    const spacing = 1400; // ပုံတစ်ခုနှင့်တစ်ခု အကွာအဝေး
+  <div class="flow-item" data-offset-x="-6" data-rotate="-2">
+    <img src="3.jpg" alt="" loading="lazy">
+    <div class="caption-track"><span class="num">03 / VISION</span><span>NOTICING BEAUTY</span></div>
+  </div>
 
-    window.addEventListener('scroll', () => {
-      const scrollY = window.scrollY;
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = maxScroll > 0 ? scrollY / maxScroll : 0;
+  <div class="flow-item" data-offset-x="4" data-rotate="3">
+    <img src="4.jpg" alt="" loading="lazy">
+    <div class="caption-track"><span class="num">04 / COMMERCIAL</span><span>SARDOR FREEFALL</span></div>
+  </div>
 
-      // Update Percentage Counter
-      pctCounter.textContent = String(Math.round(progress * 100)).padStart(3, '0') + '%';
+  <div class="flow-item" data-offset-x="-5" data-rotate="-2.5">
+    <img src="5.jpg" alt="" loading="lazy">
+    <div class="caption-track"><span class="num">05 / EXPRESSION</span><span>DESIGN MACHINE</span></div>
+  </div>
 
-      // Hide Scroll Hint
-      if (scrollY > 50) {
-        scrollHint.style.opacity = '0';
-      } else {
-        scrollHint.style.opacity = '1';
+  <div class="flow-item" data-offset-x="4" data-rotate="2">
+    <img src="6.jpg" alt="" loading="lazy">
+    <div class="caption-track"><span class="num">06 / IDENTITY</span><span>RAW PORTRAIT</span></div>
+  </div>
+
+  <div class="flow-item" data-offset-x="0" data-rotate="0">
+    <img src="7.png" alt="" loading="lazy">
+    <div class="caption-track"><span class="num">07 / NARRATIVE</span><span>DUO STUDY</span></div>
+  </div>
+</main>
+
+<div class="scroll-container"></div>
+
+<script>
+(function(){
+  const items    = Array.from(document.querySelectorAll('.flow-item'));
+  const hero     = document.getElementById('heroElement');
+  const pctLabel = document.getElementById('scrollPct');
+
+  const total = items.length;
+  const step  = 1 / total;
+  const WINDOW = step * 1.8;   // ← 1.8x ဆိုတော့ item ၂ ခုလောက် တစ်ပြိုင်နက် မြင်ရမယ် (mix)
+
+  // Pre-parse
+  const cfg = items.map(el => ({
+    el,
+    offX: parseFloat(el.dataset.offsetX) || 0,
+    rot:  parseFloat(el.dataset.rotate)  || 0
+  }));
+
+  const clamp  = (v,a,b)=>Math.min(Math.max(v,a),b);
+  const easeOut = t=>1-Math.pow(1-t,3);
+
+  let ticking = false;
+
+  function update(){
+    ticking = false;
+
+    const scrollY = window.scrollY || window.pageYOffset;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = clamp(scrollY / maxScroll, 0, 1);
+
+    pctLabel.textContent = String(Math.round(progress*100)).padStart(3,'0') + '%';
+
+    /* ── HERO: fade & zoom during first 12% ── */
+    const heroExit = clamp(progress / 0.12, 0, 1);
+    const heroScale = 1 + easeOut(heroExit) * 1.6;
+    hero.style.transform = `translate(-50%,-50%) scale(${heroScale.toFixed(3)})`;
+    hero.style.opacity   = Math.max(0, 1 - heroExit * 1.2).toFixed(3);
+
+    /* ── ITEMS: travel upward + mix ── */
+    for (let i = 0; i < total; i++){
+      const c = cfg[i];
+      const start = i * step;
+      const end   = start + WINDOW;
+      const el    = c.el;
+
+      if (progress < start || progress > end){
+        if (el.style.opacity !== '0'){
+          el.style.opacity = '0';
+          el.style.visibility = 'hidden';
+        }
+        continue;
       }
 
-      // 1. Hero Text Zoom Out
-      const heroZ = scrollY * 1.5;
-      const heroOpacity = Math.max(0, 1 - scrollY / 600);
-      heroText.style.transform = `translate3d(0, 0, ${heroZ}px)`;
-      heroText.style.opacity = heroOpacity;
+      const localP = clamp((progress - start) / (end - start), 0, 1);
 
-      // 2. 3D Zoom Effect for each Image Card
-      cards.forEach((card, index) => {
-        const x = card.getAttribute('data-x');
-        const y = card.getAttribute('data-y');
+      // ▲ VERTICAL TRAVEL: +75vh (below) → 0 → -75vh (above)
+      const y = 75 - localP * 150;
 
-        // Initial depth for this card
-        const initialZ = -((index + 1) * spacing);
-        // Current depth calculated from scroll
-        const currentZ = initialZ + (scrollY * 1.4);
+      // ► Horizontal drift (converges slightly toward center)
+      const x = c.offX * (1 - localP * 0.6);
 
-        // Opacity and Visibility calculation
-        let opacity = 0;
+      // ▲ SCALE: small at edges, biggest at center
+      const distFromCenter = Math.abs(localP - 0.5) * 2;   // 1 → edge, 0 → center
+      const scale = 0.55 + (1 - distFromCenter) * 0.65;    // 0.55 → 1.20
 
-        // အဝေးကနေ စပေါ်လာမည် (-2500px မှစ၍ fade-in)
-        if (currentZ > -2500 && currentZ < 700) {
-          if (currentZ < -800) {
-            opacity = (currentZ + 2500) / 1700;
-          } else if (currentZ >= -800 && currentZ <= 300) {
-            opacity = 1; // မျက်စိရှေ့တည့်တည့်တွင် အထင်းဆုံးဖြစ်မည်
-          } else {
-            // Screen ကို ဖြတ်ကျော်ပြီး အနောက်ရောက်သွားပါက fade-out ပျောက်ကွယ်သွားမည်
-            opacity = 1 - (currentZ - 300) / 400;
-          }
-        }
+      // Rotation drift
+      const rot = c.rot * (1 - localP);
 
-        card.style.opacity = Math.max(0, Math.min(1, opacity));
-        card.style.transform = `translate3d(${x}, ${y}, ${currentZ}px)`;
-      });
-    });
-  </script>
+      // Opacity curve
+      let opacity;
+      if (localP < 0.18)      opacity = easeOut(localP / 0.18);
+      else if (localP > 0.78) opacity = easeOut((1 - localP) / 0.22);
+      else                    opacity = 1;
+
+      el.style.visibility = 'visible';
+      el.style.opacity    = opacity.toFixed(3);
+      el.style.transform  =
+        `translate(-50%,-50%) ` +
+        `translate3d(${x.toFixed(2)}vw, ${y.toFixed(2)}vh, 0) ` +
+        `rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+    }
+  }
+
+  function onScroll(){
+    if (!ticking){
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll);
+  update(); // initial paint
+})();
+</script>
 </body>
 </html>
