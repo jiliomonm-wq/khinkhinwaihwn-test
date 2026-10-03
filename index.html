@@ -1,571 +1,346 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="HADAKA — Raw Visuals Archive. Art direction, photography, illustration & concept.">
-<title>HADAKA / ARCHIVE — Raw Visuals</title>
-<style>
-  :root{
-    --bg:#0a0a0a;
-    --card-bg:#141414;
-    --text:#f5f5f5;
-    --text-muted:#8a8a8a;
-    --accent:#ff2d55;
-    --border:rgba(255,255,255,.1);
-    --ease:cubic-bezier(.16,1,.3,1);
-    --ease-io:cubic-bezier(.76,0,.24,1);
-    --pad:3rem;
-    --font-base:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Yu Gothic","Hiragino Sans","Noto Sans JP",sans-serif;
-    --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Studio | Hadaka Style</title>
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --text: #1a1a1a;
+      --text-sub: #888888;
+      --accent: #ff334b;
+      --border: rgba(0, 0, 0, 0.08);
+      --font-mono: "SF Mono", "Roboto Mono", Menlo, Courier, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+    }
 
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-  body{
-    background:var(--bg);color:var(--text);
-    font-family:var(--font-base);line-height:1.6;letter-spacing:.03em;
-    overflow-x:hidden;-webkit-font-smoothing:antialiased;
-  }
-  body.is-loading{overflow:hidden;height:100vh}
-  img{display:block;max-width:100%}
-  a{color:inherit;text-decoration:none}
-  ::selection{background:var(--accent);color:#fff}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* ---------- Scrollbar ---------- */
-  ::-webkit-scrollbar{width:8px}
-  ::-webkit-scrollbar-track{background:#0a0a0a}
-  ::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:4px}
-  ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      letter-spacing: 0.05em;
+      line-height: 1.6;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
 
-  /* ---------- Custom Cursor ---------- */
-  .cursor,.cursor-dot{
-    position:fixed;top:0;left:0;pointer-events:none;z-index:9998;border-radius:50%;
-    mix-blend-mode:difference;
-  }
-  .cursor{
-    width:34px;height:34px;margin:-17px 0 0 -17px;border:1px solid #fff;
-    transition:width .35s var(--ease),height .35s var(--ease),margin .35s var(--ease),opacity .3s;
-  }
-  .cursor-dot{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;background:#fff}
-  .cursor.is-hover{width:74px;height:74px;margin:-37px 0 0 -37px}
-  @media (pointer:coarse){.cursor,.cursor-dot{display:none}}
+    /* hadaka-style Frame Borders */
+    .frame-border {
+      position: fixed;
+      background: var(--border);
+      z-index: 99;
+      pointer-events: none;
+    }
+    .frame-top { top: 0; left: 0; width: 100%; height: 1px; }
+    .frame-bottom { bottom: 0; left: 0; width: 100%; height: 1px; }
+    .frame-left { top: 0; left: 0; width: 1px; height: 100%; }
+    .frame-right { top: 0; right: 0; width: 1px; height: 100%; }
 
-  /* ---------- Loader ---------- */
-  .loader{
-    position:fixed;inset:0;z-index:9999;background:var(--bg);
-    display:flex;flex-direction:column;justify-content:space-between;
-    padding:var(--pad);
-    transition:transform 1.05s var(--ease-io),opacity .5s ease .4s;
-  }
-  .loader.is-done{transform:translateY(-101%);opacity:0;pointer-events:none}
-  .loader-brand{font-size:.75rem;letter-spacing:.4em;text-transform:uppercase;color:var(--text-muted)}
-  .loader-num{
-    font-family:var(--font-mono);font-weight:700;line-height:.9;text-align:right;
-    font-size:clamp(4rem,14vw,11rem);
-  }
-  .loader-bar{height:1px;background:rgba(255,255,255,.12);margin-top:2rem;overflow:hidden}
-  .loader-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s linear}
+    /* Fixed Corner UI */
+    .corner-label {
+      position: fixed;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      z-index: 100;
+      color: var(--text-sub);
+    }
+    .top-left { top: 1.5rem; left: 2rem; color: var(--text); font-weight: 700; }
+    .top-right { top: 1.5rem; right: 2rem; }
+    .bottom-left { bottom: 1.5rem; left: 2rem; }
+    .bottom-right { bottom: 1.5rem; right: 2rem; }
 
-  /* ---------- Top progress ---------- */
-  .progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:600;transition:width .1s linear}
+    /* Hero Section */
+    .hero {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 2rem 4rem 8vw;
+      max-width: 1400px;
+      position: relative;
+    }
 
-  /* ---------- Header ---------- */
-  .header{
-    position:fixed;top:0;left:0;width:100%;z-index:400;
-    padding:1.5rem var(--pad);
-    display:flex;justify-content:space-between;align-items:center;
-    mix-blend-mode:difference;
-    transition:transform .55s var(--ease);
-  }
-  .header.is-hidden{transform:translateY(-110%)}
-  .brand{font-size:1rem;font-weight:900;letter-spacing:.28em;text-transform:uppercase;color:#fff}
-  .brand span{color:var(--accent)}
-  .counter{font-family:var(--font-mono);font-size:.95rem;letter-spacing:.12em;color:#fff}
+    .hero-counter {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      color: var(--accent);
+      display: inline-block;
+    }
 
-  /* ---------- Hero ---------- */
-  .hero{
-    position:relative;
-    min-height:100vh;min-height:100svh;
-    display:flex;flex-direction:column;justify-content:flex-end;
-    padding:8rem var(--pad) 6rem;
-    max-width:1400px;margin:0 auto;
-  }
-  .hero-eyebrow{
-    font-family:var(--font-mono);font-size:.78rem;letter-spacing:.38em;
-    color:var(--accent);margin-bottom:1.75rem;
-    opacity:0;transform:translateY(24px);
-    transition:opacity .9s var(--ease) .2s,transform .9s var(--ease) .2s;
-  }
-  body.is-loaded .hero-eyebrow{opacity:1;transform:none}
+    .hero-h1 {
+      font-size: clamp(2.5rem, 6.5vw, 6rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+    }
 
-  .hero-title{
-    font-size:clamp(3rem,9vw,8.5rem);
-    font-weight:900;line-height:1.02;letter-spacing:-.035em;
-    margin-bottom:2.25rem;
-    will-change:transform;
-  }
-  .hero-title .line{display:block;overflow:hidden;padding-bottom:.06em}
-  .hero-title .line > span{display:block;transform:translateY(118%);transition:transform 1.15s var(--ease-io)}
-  body.is-loaded .hero-title .line:nth-child(1) > span{transform:translateY(0);transition-delay:.35s}
-  body.is-loaded .hero-title .line:nth-child(2) > span{transform:translateY(0);transition-delay:.47s}
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--text-sub);
+      max-width: 460px;
+      line-height: 1.8;
+    }
 
-  .hero-description{
-    font-size:clamp(1rem,1.4vw,1.25rem);
-    color:var(--text-muted);max-width:620px;
-    opacity:0;transform:translateY(24px);
-    transition:opacity .9s var(--ease) .75s,transform .9s var(--ease) .75s;
-  }
-  body.is-loaded .hero-description{opacity:1;transform:none}
+    /* hadaka-style Floating Gallery */
+    .gallery-container {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 0 4vw 12rem;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      row-gap: 8rem;
+      column-gap: 2rem;
+      align-items: center;
+    }
 
-  .scroll-hint{
-    position:absolute;right:var(--pad);bottom:6rem;
-    writing-mode:vertical-rl;
-    font-family:var(--font-mono);font-size:.65rem;letter-spacing:.35em;
-    color:var(--text-muted);text-transform:uppercase;
-    display:flex;align-items:center;gap:1rem;
-    opacity:0;transition:opacity 1s ease 1.2s;
-  }
-  body.is-loaded .scroll-hint{opacity:1}
-  .scroll-hint::after{
-    content:"";width:1px;height:64px;background:linear-gradient(var(--text-muted),transparent);
-    animation:scrollLine 2.2s var(--ease) infinite;
-  }
-  @keyframes scrollLine{
-    0%{transform:scaleY(0);transform-origin:top}
-    50%{transform:scaleY(1);transform-origin:top}
-    51%{transform:scaleY(1);transform-origin:bottom}
-    100%{transform:scaleY(0);transform-origin:bottom}
-  }
+    .art-card {
+      position: relative;
+      background: #ffffff;
+      padding: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      border: 1px solid var(--border);
+      transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
 
-  /* ---------- Marquee ---------- */
-  .marquee{
-    display:flex;overflow:hidden;
-    border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-    padding:1.6rem 0;user-select:none;
-  }
-  .marquee-track{
-    display:flex;flex-shrink:0;align-items:center;
-    animation:marquee 30s linear infinite;
-  }
-  .marquee:hover .marquee-track{animation-play-state:paused}
-  .marquee-track span{
-    padding:0 2.2rem;white-space:nowrap;
-    font-size:clamp(1.1rem,2.6vw,2rem);font-weight:900;
-    text-transform:uppercase;letter-spacing:.1em;
-    color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.34);
-  }
-  .marquee-track span:nth-child(even){color:var(--text);-webkit-text-stroke:0}
-  .marquee-track span::after{content:"—";margin-left:4.4rem;color:var(--accent);-webkit-text-stroke:0}
-  @keyframes marquee{to{transform:translateX(-100%)}}
+    .art-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      z-index: 10;
+    }
 
-  /* ---------- Works ---------- */
-  .works{max-width:1400px;margin:0 auto;padding:6rem var(--pad) 8rem}
-  .section-header{
-    display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;
-    border-bottom:1px solid var(--border);padding-bottom:1.5rem;margin-bottom:4rem;
-  }
-  .section-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;letter-spacing:.05em}
-  .section-meta{font-family:var(--font-mono);font-size:.78rem;color:var(--text-muted);letter-spacing:.15em}
+    .art-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: saturate(90%);
+      transition: filter 0.3s ease;
+    }
 
-  .works-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3.5rem 2rem}
-  .work-item{display:flex;flex-direction:column;gap:1rem}
-  .work-item.col-12{grid-column:span 12}
-  .work-item.col-7{grid-column:span 7}
-  .work-item.col-5{grid-column:span 5}
-  .work-item.col-6{grid-column:span 6}
+    .art-card:hover img {
+      filter: saturate(110%);
+    }
 
-  .image-wrapper{
-    position:relative;overflow:hidden;border-radius:6px;
-    background:var(--card-bg);border:1px solid var(--border);
-    clip-path:inset(0 0 100% 0);
-    transition:clip-path 1.1s var(--ease-io);
-    transition-delay:calc(var(--d,0) * 1ms);
-  }
-  .reveal.is-in .image-wrapper{clip-path:inset(0 0 0 0)}
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
 
-  .image-wrapper img{
-    width:100%;height:100%;object-fit:cover;
-    filter:grayscale(22%) contrast(1.05);
-    transition:transform 1.2s var(--ease),filter .6s ease;
-  }
-  .work-item:hover .image-wrapper img{transform:scale(1.055);filter:grayscale(0) contrast(1.05)}
+    .card-meta .index {
+      color: var(--accent);
+    }
 
-  .image-wrapper::before{
-    content:"";position:absolute;inset:0;z-index:2;
-    background:linear-gradient(to top,rgba(10,10,10,.55),transparent 55%);
-    opacity:0;transition:opacity .5s ease;pointer-events:none;
-  }
-  .work-item:hover .image-wrapper::before{opacity:1}
+    /* Irregular Asymmetric Positioning (hadaka layout) */
+    .pos-1 { grid-column: 2 / span 9; }
+    .pos-2 { grid-column: 7 / span 5; margin-top: -3rem; }
+    .pos-3 { grid-column: 1 / span 5; }
+    .pos-4 { grid-column: 6 / span 6; }
+    .pos-5 { grid-column: 2 / span 5; }
+    .pos-6 { grid-column: 8 / span 4; }
+    .pos-7 { grid-column: 4 / span 6; }
 
-  .image-wrapper.no-img{
-    background:repeating-linear-gradient(45deg,#131313,#131313 12px,#181818 12px,#181818 24px);
-  }
-  .image-wrapper.no-img img{opacity:0}
+    /* Philosophy / 3 Pillars Section */
+    .philosophy {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 6rem 4vw;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+    }
 
-  .aspect-landscape{aspect-ratio:16/9}
-  .aspect-tall{aspect-ratio:9/16;max-height:700px}
-  .aspect-square{aspect-ratio:1/1}
-  .aspect-poster{aspect-ratio:3/4}
+    .pillar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
 
-  .meta{
-    display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;
-    border-top:1px solid rgba(255,255,255,.07);padding-top:.9rem;
-  }
-  .meta-id{
-    display:block;font-family:var(--font-mono);font-size:.7rem;
-    letter-spacing:.2em;color:var(--accent);margin-bottom:.35rem;
-  }
-  .meta-title{font-size:1.15rem;font-weight:700}
-  .meta-tag{
-    font-size:.76rem;color:var(--text-muted);white-space:nowrap;
-    padding-top:.2rem;letter-spacing:.08em;
-  }
+    .pillar-num {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
 
-  /* ---------- Reveal ---------- */
-  .reveal{
-    opacity:0;transform:translateY(42px);
-    transition:opacity .95s var(--ease),transform .95s var(--ease);
-    transition-delay:calc(var(--d,0) * 1ms);
-  }
-  .reveal.is-in{opacity:1;transform:none}
+    .pillar-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
 
-  /* ---------- Footer ---------- */
-  .footer{border-top:1px solid var(--border);padding:4rem var(--pad) 3rem}
-  .footer-inner{max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:3rem}
-  .footer-mark{
-    font-size:clamp(3rem,14vw,12rem);font-weight:900;line-height:.85;
-    letter-spacing:-.04em;text-align:center;
-    color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.22);
-  }
-  .footer-row{
-    display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;
-    color:var(--text-muted);font-size:.8rem;letter-spacing:.1em;
-    font-family:var(--font-mono);
-  }
+    .pillar-text {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+    }
 
-  /* ---------- Responsive ---------- */
-  @media (max-width:900px){
-    :root{--pad:1.5rem}
-    .work-item.col-7,
-    .work-item.col-5,
-    .work-item.col-6{grid-column:span 12}
-    .aspect-tall{max-height:520px}
-    .scroll-hint{display:none}
-    .hero{padding-top:6rem;padding-bottom:4rem}
-    .section-header{flex-direction:column;align-items:flex-start;gap:.5rem}
-    .footer-row{flex-direction:column;align-items:center;text-align:center}
-    .marquee-track span{padding:0 1.2rem}
-    .marquee-track span::after{margin-left:2.4rem}
-  }
+    /* Footer */
+    footer {
+      padding: 6rem 4vw 4rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      border-top: 1px solid var(--border);
+    }
 
-  @media (prefers-reduced-motion:reduce){
-    *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
-    .reveal{opacity:1;transform:none}
-    .image-wrapper{clip-path:none}
-  }
-</style>
+    @media (max-width: 850px) {
+      .pos-1, .pos-2, .pos-3, .pos-4, .pos-5, .pos-6, .pos-7 {
+        grid-column: 1 / span 12 !0important;
+        margin-top: 0;
+      }
+      .gallery-container {
+        row-gap: 3rem;
+      }
+      .corner-label.bottom-left, .corner-label.bottom-right {
+        display: none;
+      }
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
 </head>
-<body class="is-loading">
+<body>
 
-  <!-- ===== LOADER ===== -->
-  <div class="loader" id="loader">
-    <div class="loader-brand">HADAKA / ARCHIVE</div>
-    <div>
-      <div class="loader-num" id="loaderNum">000</div>
-      <div class="loader-bar"><i id="loaderBar"></i></div>
-    </div>
-  </div>
+  <!-- Perimeter frame lines -->
+  <div class="frame-border frame-top"></div>
+  <div class="frame-border frame-bottom"></div>
+  <div class="frame-border frame-left"></div>
+  <div class="frame-border frame-right"></div>
 
-  <!-- ===== CURSOR ===== -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-dot" id="cursorDot"></div>
+  <!-- Four Corners UI -->
+  <div class="corner-label top-left">HADAKA.JP / REPRO</div>
+  <div class="corner-label top-right" id="pctCounter">000%</div>
+  <div class="corner-label bottom-left">35.6895° N, 139.6917° E</div>
+  <div class="corner-label bottom-right">SCROLL TO DISCOVER</div>
 
-  <!-- ===== PROGRESS ===== -->
-  <div class="progress" id="progress"></div>
-
-  <!-- ===== HEADER ===== -->
-  <header class="header" id="header">
-    <div class="brand">HADAKA <span>/</span> ARCHIVE</div>
-    <div class="counter" id="scrollIndicator">000%</div>
+  <!-- Hero Header -->
+  <header class="hero">
+    <div class="hero-counter">0 TO WONDER</div>
+    <h1 class="hero-h1">すべてを、<br>裸に。</h1>
+    <p class="hero-sub">
+      剝ぎ取ること。飾らないこと。本質をむき出しにして、新しい驚きをつくるクリエイティブスタジオ。
+    </p>
   </header>
 
-  <!-- ===== HERO ===== -->
-  <section class="hero">
-    <div class="hero-eyebrow">00 — RAW VISUALS</div>
-    <h1 class="hero-title" id="heroTitle">
-      <span class="line"><span>すべてを、</span></span>
-      <span class="line"><span>裸に。</span></span>
-    </h1>
-    <p class="hero-description">
-      Stripping away the noise. High-contrast visual experimentation across character art,
-      advertising concept, editorial direction, and nature.
-    </p>
-    <div class="scroll-hint">Scroll</div>
-  </section>
-
-  <!-- ===== MARQUEE ===== -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>Raw Visuals</span><span>Art Direction</span><span>Photography</span>
-      <span>Illustration</span><span>Concept</span><span>Editorial</span>
-    </div>
-    <div class="marquee-track">
-      <span>Raw Visuals</span><span>Art Direction</span><span>Photography</span>
-      <span>Illustration</span><span>Concept</span><span>Editorial</span>
-    </div>
-  </div>
-
-  <!-- ===== WORKS ===== -->
-  <main class="works">
-    <div class="section-header">
-      <div class="section-title">Selected Works (07)</div>
-      <div class="section-meta">INDEX 2024–2026</div>
-    </div>
-
-    <div class="works-grid">
-
-      <!-- 01 -->
-      <article class="work-item col-12 reveal" style="--d:0">
-        <div class="image-wrapper aspect-landscape">
-          <img src="1.jpg" alt="Deep Forest Sunlight Landscape" loading="lazy">
-        </div>
-        <div class="meta">
-          <div>
-            <span class="meta-id">01 / WORLD</span>
-            <h3 class="meta-title">Untamed Canopy</h3>
-          </div>
-          <span class="meta-tag">Atmospheric Art</span>
-        </div>
-      </article>
-
-      <!-- 02 -->
-      <article class="work-item col-5 reveal" style="--d:80">
-        <div class="image-wrapper aspect-tall">
-          <img src="2.jpg" alt="Horned Mask Wrapped in Red Tape" loading="lazy">
-        </div>
-        <div class="meta">
-          <div>
-            <span class="meta-id">02 / AVANT-GARDE</span>
-            <h3 class="meta-title">The Ritual Tape</h3>
-          </div>
-          <span class="meta-tag">Art Direction</span>
-        </div>
-      </article>
-
-      <!-- 03 -->
-      <article class="work-item col-7 reveal" style="--d:160">
-        <div class="image-wrapper aspect-poster">
-          <img src="3.jpg" alt="Focus Eagle Head Illustration" loading="lazy">
-        </div>
-        <div class="meta">
-          <div>
-            <span class="meta-id">03 / DETAIL</span>
-            <h3 class="meta-title">The Art of Noticing</h3>
-          </div>
-          <span class="meta-tag">Typography &amp; Illustration</span>
-        </div>
-      </article>
-
-      <!-- 04 -->
-      <article class="work-item col-6 reveal" style="--d:0">
-        <div class="image-wrapper aspect-poster">
-          <img src="4.jpg" alt="Sardor Skydiving Commercial" loading="lazy">
-        </div>
-        <div class="meta">
-          <div>
-            <span class="meta-id">04 / COMMERCIAL</span>
-            <h3 class="meta-title">Sardor Adventure</h3>
-          </div>
-          <span class="meta-tag">Packaging &amp; Campaign</span>
-        </div>
-      </article>
-
-      <!-- 05 -->
-      <article class="work-item col-6 reveal" style="--d:100">
-        <div class="image-wrapper aspect-poster">
-          <img src="5.jpg" alt="Designers are not Design Machines" loading="lazy">
-        </div>
-        <div class="meta">
-          <div>
-            <span class="meta-id">05 / CONCEPT</span>
-            <h3 class="meta-title">Working Under Pressure</h3>
-          </div>
-          <span class="meta-tag">Editorial Poster</span>
-        </div>
-      </article>
-
-      <!-- 06 -->
-      <article class="work-item col-6 reveal" style="--d:0">
-        <div class="image-wrapper aspect-square">
-          <img src="6.jpg" alt="Portrait with Glasses" loading="lazy">
-        </div>
-        <div class="meta">
-          <div>
-            <span class="meta-id">06 / IDENTITY</span>
-            <h3 class="meta-title">Gaze &amp; Silence</h3>
-          </div>
-          <span class="meta-tag">Portrait Photography</span>
-        </div>
-      </article>
-
-      <!-- 07 -->
-      <article class="work-item col-6 reveal" style="--d:100">
-        <div class="image-wrapper aspect-square">
-          <img src="7.png" alt="Anime Illustration Couple" loading="lazy">
-        </div>
-        <div class="meta">
-          <div>
-            <span class="meta-id">07 / NARRATIVE</span>
-            <h3 class="meta-title">Duo Portrait</h3>
-          </div>
-          <span class="meta-tag">Digital Manga Art</span>
-        </div>
-      </article>
-
-    </div>
-  </main>
-
-  <!-- ===== FOOTER ===== -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-mark">HADAKA</div>
-      <div class="footer-row">
-        <div>&copy; HADAKA CONCEPT ARCHIVE — ALL RIGHTS RESERVED.</div>
-        <div>TOKYO / MANDALAY</div>
+  <!-- Floating Canvas Visuals -->
+  <main class="gallery-container">
+    
+    <!-- 1: Landscape Nature -->
+    <div class="art-card pos-1">
+      <img src="1.jpg" alt="Untamed Jungle" loading="lazy">
+      <div class="card-meta">
+        <span class="index">01 / WORLD</span>
+        <span>CANOPY LIGHT</span>
       </div>
     </div>
+
+    <!-- 2: Avant-garde Horns Portrait -->
+    <div class="art-card pos-2">
+      <img src="2.jpg" alt="Avant Garde Horns" loading="lazy">
+      <div class="card-meta">
+        <span class="index">02 / ART</span>
+        <span>RED TAPE</span>
+      </div>
+    </div>
+
+    <!-- 3: Falcon Eye / Focus -->
+    <div class="art-card pos-3">
+      <img src="3.jpg" alt="Falcon Graphic" loading="lazy">
+      <div class="card-meta">
+        <span class="index">03 / VISION</span>
+        <span>THE ART OF NOTICING</span>
+      </div>
+    </div>
+
+    <!-- 4: Extreme Skydiving Packaging -->
+    <div class="art-card pos-4">
+      <img src="4.jpg" alt="Commercial Art" loading="lazy">
+      <div class="card-meta">
+        <span class="index">04 / COMMERCIAL</span>
+        <span>SARDOR PACK</span>
+      </div>
+    </div>
+
+    <!-- 5: Cat Mouse Poster -->
+    <div class="art-card pos-5">
+      <img src="5.jpg" alt="Design Machine Poster" loading="lazy">
+      <div class="card-meta">
+        <span class="index">05 / EXPRESSION</span>
+        <span>DESIGN MACHINE</span>
+      </div>
+    </div>
+
+    <!-- 6: Portrait -->
+    <div class="art-card pos-6">
+      <img src="6.jpg" alt="Real Portrait" loading="lazy">
+      <div class="card-meta">
+        <span class="index">06 / IDENTITY</span>
+        <span>RAW PORTRAIT</span>
+      </div>
+    </div>
+
+    <!-- 7: Anime Art -->
+    <div class="art-card pos-7">
+      <img src="7.png" alt="Anime Illustration" loading="lazy">
+      <div class="card-meta">
+        <span class="index">07 / ILLUSTRATION</span>
+        <span>DUO STUDY</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Core Pillars -->
+  <section class="philosophy">
+    <div class="pillar-item">
+      <div class="pillar-num">01 / IDENTITY</div>
+      <div class="pillar-title">Vision</div>
+      <p class="pillar-text">明確なアイデンティティ。ブランドの本質をむき出しにして軸を定め、ブレない基盤を築きます。</p>
+    </div>
+    <div class="pillar-item">
+      <div class="pillar-num">02 / VISUALS</div>
+      <div class="pillar-title">Art</div>
+      <p class="pillar-text">競合に打ち勝つビジュアル。ただ綺麗に整えるのではなく、強い印象と独自の質感を創出します。</p>
+    </div>
+    <div class="pillar-item">
+      <div class="pillar-num">03 / EXPRESSION</div>
+      <div class="pillar-title">Illustration</div>
+      <p class="pillar-text">思考を具現化するための表現。言葉にできない感覚や世界観を、自由なビジュアルへと昇華します。</p>
+    </div>
+  </section>
+
+  <!-- Minimal Footer -->
+  <footer>
+    <div>&copy; HADAKA REPRODUCTION ARCHIVE</div>
+    <div>DESIGNED WITH PURE SIMPLICITY</div>
   </footer>
 
-<script>
-(function () {
-  'use strict';
-
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- 1. LOADER ---------- */
-  var loader    = document.getElementById('loader');
-  var loaderNum = document.getElementById('loaderNum');
-  var loaderBar = document.getElementById('loaderBar');
-  var progress  = 0;
-
-  function finishLoad() {
-    loader.classList.add('is-done');
-    document.body.classList.remove('is-loading');
-    document.body.classList.add('is-loaded');
-    setTimeout(function () { loader.style.display = 'none'; }, 1600);
-  }
-
-  function tickLoader() {
-    progress += Math.random() * 7 + 2;
-    if (progress >= 100) progress = 100;
-
-    loaderNum.textContent = String(Math.floor(progress)).padStart(3, '0');
-    loaderBar.style.width = progress + '%';
-
-    if (progress < 100) {
-      setTimeout(tickLoader, 60 + Math.random() * 60);
-    } else {
-      setTimeout(finishLoad, 420);
-    }
-  }
-
-  if (reduced) {
-    finishLoad();
-  } else {
-    tickLoader();
-  }
-
-  /* ---------- 2. CUSTOM CURSOR ---------- */
-  var cursor    = document.getElementById('cursor');
-  var cursorDot = document.getElementById('cursorDot');
-  var finePointer = window.matchMedia('(pointer: fine)').matches;
-
-  if (finePointer && !reduced) {
-    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    var cx = mx, cy = my;
-
-    window.addEventListener('mousemove', function (e) {
-      mx = e.clientX; my = e.clientY;
-      cursorDot.style.transform = 'translate(' + mx + 'px,' + my + 'px)';
+  <script>
+    const pct = document.getElementById('pctCounter');
+    window.addEventListener('scroll', () => {
+      const top = window.scrollY;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = h > 0 ? Math.round((top / h) * 100) : 0;
+      pct.textContent = String(progress).padStart(3, '0') + '%';
     });
-
-    (function render() {
-      cx += (mx - cx) * 0.16;
-      cy += (my - cy) * 0.16;
-      cursor.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
-      requestAnimationFrame(render);
-    })();
-
-    document.querySelectorAll('a, button, .work-item').forEach(function (el) {
-      el.addEventListener('mouseenter', function () { cursor.classList.add('is-hover'); });
-      el.addEventListener('mouseleave', function () { cursor.classList.remove('is-hover'); });
-    });
-  } else {
-    cursor.style.display = 'none';
-    cursorDot.style.display = 'none';
-  }
-
-  /* ---------- 3. SCROLL : counter / progress / header ---------- */
-  var header    = document.getElementById('header');
-  var counter   = document.getElementById('scrollIndicator');
-  var heroTitle = document.getElementById('heroTitle');
-  var lastY = 0;
-  var ticking = false;
-
-  function onScroll() {
-    var y = window.scrollY || window.pageYOffset;
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    var pct = max > 0 ? Math.round((y / max) * 100) : 0;
-
-    counter.textContent = String(pct).padStart(3, '0') + '%';
-    progress && (document.getElementById('progress').style.width = pct + '%');
-
-    header.classList.toggle('is-hidden', y > lastY && y > 220);
-
-    if (!reduced && heroTitle && y < window.innerHeight) {
-      heroTitle.style.transform = 'translateY(' + (y * 0.14) + 'px)';
-    }
-
-    lastY = y;
-    ticking = false;
-  }
-
-  window.addEventListener('scroll', function () {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(onScroll);
-    }
-  }, { passive: true });
-
-  onScroll();
-
-  /* ---------- 4. REVEAL ON SCROLL ---------- */
-  var reveals = document.querySelectorAll('.reveal');
-
-  if ('IntersectionObserver' in window && !reduced) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-in');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-
-    reveals.forEach(function (el) { io.observe(el); });
-  } else {
-    reveals.forEach(function (el) { el.classList.add('is-in'); });
-  }
-
-  /* ---------- 5. IMAGE FALLBACK ---------- */
-  document.querySelectorAll('.image-wrapper img').forEach(function (img) {
-    img.addEventListener('error', function () {
-      img.closest('.image-wrapper').classList.add('no-img');
-    });
-  });
-
-})();
-</script>
+  </script>
 </body>
 </html>
