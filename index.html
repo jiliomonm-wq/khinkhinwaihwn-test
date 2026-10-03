@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Creative Studio | Hadaka Style</title>
+  <title>HADAKA.JP | 3D Zoom Scroll Archive</title>
   <style>
     :root {
-      --bg: #f7f7f7;
-      --text: #1a1a1a;
-      --text-sub: #888888;
-      --accent: #ff334b;
-      --border: rgba(0, 0, 0, 0.08);
-      --font-mono: "SF Mono", "Roboto Mono", Menlo, Courier, monospace;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+      --bg: #f8f8f8;
+      --text: #111111;
+      --muted: #888888;
+      --accent: #ff2d55;
+      --font-mono: "SF Mono", Monaco, Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Yu Gothic", "Hiragino Sans", sans-serif;
     }
 
     * {
@@ -25,321 +24,297 @@
       background-color: var(--bg);
       color: var(--text);
       font-family: var(--font-sans);
-      letter-spacing: 0.05em;
-      line-height: 1.6;
       overflow-x: hidden;
-      cursor: crosshair;
+      /* Scroll speed နှင့် zoom space အတွက် အမြင့်ထားရှိခြင်း */
+      height: 900vh;
     }
 
-    /* hadaka-style Frame Borders */
-    .frame-border {
+    /* Fixed Minimal UI - Corners */
+    .ui-layer {
       position: fixed;
-      background: var(--border);
-      z-index: 99;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       pointer-events: none;
-    }
-    .frame-top { top: 0; left: 0; width: 100%; height: 1px; }
-    .frame-bottom { bottom: 0; left: 0; width: 100%; height: 1px; }
-    .frame-left { top: 0; left: 0; width: 1px; height: 100%; }
-    .frame-right { top: 0; right: 0; width: 1px; height: 100%; }
-
-    /* Fixed Corner UI */
-    .corner-label {
-      position: fixed;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
       z-index: 100;
-      color: var(--text-sub);
-    }
-    .top-left { top: 1.5rem; left: 2rem; color: var(--text); font-weight: 700; }
-    .top-right { top: 1.5rem; right: 2rem; }
-    .bottom-left { bottom: 1.5rem; left: 2rem; }
-    .bottom-right { bottom: 1.5rem; right: 2rem; }
-
-    /* Hero Section */
-    .hero {
-      min-height: 80vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 8rem 2rem 4rem 8vw;
-      max-width: 1400px;
-      position: relative;
-    }
-
-    .hero-counter {
+      justify-content: space-between;
+      padding: 2rem 2.5rem;
       font-family: var(--font-mono);
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
-      color: var(--accent);
-      display: inline-block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
     }
 
-    .hero-h1 {
-      font-size: clamp(2.5rem, 6.5vw, 6rem);
+    .ui-top, .ui-bottom {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .brand-title {
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .counter-display {
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    /* 3D Viewport Stage */
+    .viewport-stage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      perspective: 1000px;
+      perspective-origin: 50% 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Center Tagline that zooms out first */
+    .hero-center {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      will-change: transform, opacity;
+    }
+
+    .hero-center h1 {
+      font-size: clamp(3rem, 8vw, 7rem);
       font-weight: 900;
       line-height: 1.1;
       letter-spacing: -0.02em;
-      margin-bottom: 2rem;
     }
 
-    .hero-sub {
-      font-size: 1rem;
-      color: var(--text-sub);
-      max-width: 460px;
-      line-height: 1.8;
+    .hero-center p {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.3em;
     }
 
-    /* hadaka-style Floating Gallery */
-    .gallery-container {
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 0 4vw 12rem;
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      row-gap: 8rem;
-      column-gap: 2rem;
-      align-items: center;
-    }
-
-    .art-card {
-      position: relative;
+    /* 3D Floating Zoom Cards */
+    .zoom-card {
+      position: absolute;
+      width: 38vw;
+      max-width: 500px;
       background: #ffffff;
-      padding: 1rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-      border: 1px solid var(--border);
-      transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.4s ease;
+      padding: 12px;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+      transform: translate3d(0, 0, -5000px);
+      opacity: 0;
+      pointer-events: auto;
     }
 
-    .art-card:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-      z-index: 10;
-    }
-
-    .art-card img {
+    .zoom-card img {
       width: 100%;
       height: auto;
       display: block;
-      filter: saturate(90%);
-      transition: filter 0.3s ease;
+      object-fit: cover;
     }
 
-    .art-card:hover img {
-      filter: saturate(110%);
-    }
-
-    .card-meta {
+    .card-label {
+      margin-top: 10px;
       display: flex;
       justify-content: space-between;
-      margin-top: 0.75rem;
       font-family: var(--font-mono);
       font-size: 0.75rem;
-      color: var(--text-sub);
+      color: var(--muted);
     }
 
-    .card-meta .index {
+    .card-label .idx {
       color: var(--accent);
+      font-weight: bold;
     }
 
-    /* Irregular Asymmetric Positioning (hadaka layout) */
-    .pos-1 { grid-column: 2 / span 9; }
-    .pos-2 { grid-column: 7 / span 5; margin-top: -3rem; }
-    .pos-3 { grid-column: 1 / span 5; }
-    .pos-4 { grid-column: 6 / span 6; }
-    .pos-5 { grid-column: 2 / span 5; }
-    .pos-6 { grid-column: 8 / span 4; }
-    .pos-7 { grid-column: 4 / span 6; }
-
-    /* Philosophy / 3 Pillars Section */
-    .philosophy {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 6rem 4vw;
-      border-top: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 3rem;
-    }
-
-    .pillar-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .pillar-num {
+    /* Scroll Prompt Indicator */
+    .scroll-hint {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
       font-family: var(--font-mono);
-      font-size: 0.85rem;
-      color: var(--accent);
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      pointer-events: none;
+      z-index: 100;
+      transition: opacity 0.4s ease;
     }
 
-    .pillar-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-
-    .pillar-text {
-      font-size: 0.9rem;
-      color: var(--text-sub);
-    }
-
-    /* Footer */
-    footer {
-      padding: 6rem 4vw 4rem;
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      border-top: 1px solid var(--border);
-    }
-
-    @media (max-width: 850px) {
-      .pos-1, .pos-2, .pos-3, .pos-4, .pos-5, .pos-6, .pos-7 {
-        grid-column: 1 / span 12 !0important;
-        margin-top: 0;
+    @media (max-width: 768px) {
+      .zoom-card {
+        width: 75vw;
       }
-      .gallery-container {
-        row-gap: 3rem;
-      }
-      .corner-label.bottom-left, .corner-label.bottom-right {
-        display: none;
-      }
-      footer {
-        flex-direction: column;
-        gap: 1rem;
+      .ui-layer {
+        padding: 1.25rem 1.5rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Perimeter frame lines -->
-  <div class="frame-border frame-top"></div>
-  <div class="frame-border frame-bottom"></div>
-  <div class="frame-border frame-left"></div>
-  <div class="frame-border frame-right"></div>
+  <!-- Screen Frame UI -->
+  <div class="ui-layer">
+    <div class="ui-top">
+      <div class="brand-title">HADAKA / ARCHIVE</div>
+      <div class="counter-display" id="pctCounter">000%</div>
+    </div>
+    <div class="ui-bottom">
+      <div>0 TO WONDER</div>
+      <div>TOKYO / MANDALAY</div>
+    </div>
+  </div>
 
-  <!-- Four Corners UI -->
-  <div class="corner-label top-left">HADAKA.JP / REPRO</div>
-  <div class="corner-label top-right" id="pctCounter">000%</div>
-  <div class="corner-label bottom-left">35.6895° N, 139.6917° E</div>
-  <div class="corner-label bottom-right">SCROLL TO DISCOVER</div>
+  <div class="scroll-hint" id="scrollHint">SCROLL TO DIVE IN ↓</div>
 
-  <!-- Hero Header -->
-  <header class="hero">
-    <div class="hero-counter">0 TO WONDER</div>
-    <h1 class="hero-h1">すべてを、<br>裸に。</h1>
-    <p class="hero-sub">
-      剝ぎ取ること。飾らないこと。本質をむき出しにして、新しい驚きをつくるクリエイティブスタジオ。
-    </p>
-  </header>
+  <!-- 3D Stage -->
+  <div class="viewport-stage">
 
-  <!-- Floating Canvas Visuals -->
-  <main class="gallery-container">
-    
-    <!-- 1: Landscape Nature -->
-    <div class="art-card pos-1">
-      <img src="1.jpg" alt="Untamed Jungle" loading="lazy">
-      <div class="card-meta">
-        <span class="index">01 / WORLD</span>
-        <span>CANOPY LIGHT</span>
+    <!-- Center Hero Title -->
+    <div class="hero-center" id="heroText">
+      <h1>すべてを、<br>裸に。</h1>
+      <p>DEPTH EXPERIENCE / 2026</p>
+    </div>
+
+    <!-- 7 Zoom Items (ကွဲပြားသော X, Y နေရာများမှ ချဉ်းကပ်လာမည်) -->
+    <!-- 1. Jungle[span_0](start_span)[span_0](end_span) -->
+    <div class="zoom-card" data-speed="1" data-x="-5vw" data-y="0vh">
+      <img src="1.jpg" alt="Nature Deep Forest">
+      <div class="card-label">
+        <span class="idx">01 / WORLD</span>
+        <span>UNTAMED CANOPY</span>
       </div>
     </div>
 
-    <!-- 2: Avant-garde Horns Portrait -->
-    <div class="art-card pos-2">
-      <img src="2.jpg" alt="Avant Garde Horns" loading="lazy">
-      <div class="card-meta">
-        <span class="index">02 / ART</span>
-        <span>RED TAPE</span>
+    <!-- 2. Horns Mask[span_1](start_span)[span_1](end_span) -->
+    <div class="zoom-card" data-speed="2" data-x="18vw" data-y="-8vh">
+      <img src="2.jpg" alt="Horned Mask">
+      <div class="card-label">
+        <span class="idx">02 / ART</span>
+        <span>RITUAL TAPE</span>
       </div>
     </div>
 
-    <!-- 3: Falcon Eye / Focus -->
-    <div class="art-card pos-3">
-      <img src="3.jpg" alt="Falcon Graphic" loading="lazy">
-      <div class="card-meta">
-        <span class="index">03 / VISION</span>
+    <!-- 3. Eagle Focus[span_2](start_span)[span_2](end_span) -->
+    <div class="zoom-card" data-speed="3" data-x="-20vw" data-y="8vh">
+      <img src="3.jpg" alt="Focus Eagle">
+      <div class="card-label">
+        <span class="idx">03 / DETAIL</span>
         <span>THE ART OF NOTICING</span>
       </div>
     </div>
 
-    <!-- 4: Extreme Skydiving Packaging -->
-    <div class="art-card pos-4">
-      <img src="4.jpg" alt="Commercial Art" loading="lazy">
-      <div class="card-meta">
-        <span class="index">04 / COMMERCIAL</span>
-        <span>SARDOR PACK</span>
+    <!-- 4. Skydiving Snack[span_3](start_span)[span_3](end_span) -->
+    <div class="zoom-card" data-speed="4" data-x="15vw" data-y="12vh">
+      <img src="4.jpg" alt="Sardor Adventure">
+      <div class="card-label">
+        <span class="idx">04 / COMMERCIAL</span>
+        <span>EXTREME ADVENTURE</span>
       </div>
     </div>
 
-    <!-- 5: Cat Mouse Poster -->
-    <div class="art-card pos-5">
-      <img src="5.jpg" alt="Design Machine Poster" loading="lazy">
-      <div class="card-meta">
-        <span class="index">05 / EXPRESSION</span>
-        <span>DESIGN MACHINE</span>
+    <!-- 5. Cat Poster[span_4](start_span)[span_4](end_span) -->
+    <div class="zoom-card" data-speed="5" data-x="-18vw" data-y="-12vh">
+      <img src="5.jpg" alt="Design Machine">
+      <div class="card-label">
+        <span class="idx">05 / CONCEPT</span>
+        <span>UNDER PRESSURE</span>
       </div>
     </div>
 
-    <!-- 6: Portrait -->
-    <div class="art-card pos-6">
-      <img src="6.jpg" alt="Real Portrait" loading="lazy">
-      <div class="card-meta">
-        <span class="index">06 / IDENTITY</span>
+    <!-- 6. Real Portrait[span_5](start_span)[span_5](end_span) -->
+    <div class="zoom-card" data-speed="6" data-x="8vw" data-y="-4vh">
+      <img src="6.jpg" alt="Portrait">
+      <div class="card-label">
+        <span class="idx">06 / IDENTITY</span>
         <span>RAW PORTRAIT</span>
       </div>
     </div>
 
-    <!-- 7: Anime Art -->
-    <div class="art-card pos-7">
-      <img src="7.png" alt="Anime Illustration" loading="lazy">
-      <div class="card-meta">
-        <span class="index">07 / ILLUSTRATION</span>
+    <!-- 7. Anime Duo[span_6](start_span)[span_6](end_span) -->
+    <div class="zoom-card" data-speed="7" data-x="0vw" data-y="0vh">
+      <img src="7.png" alt="Anime Illustration">
+      <div class="card-label">
+        <span class="idx">07 / ILLUSTRATION</span>
         <span>DUO STUDY</span>
       </div>
     </div>
 
-  </main>
-
-  <!-- Core Pillars -->
-  <section class="philosophy">
-    <div class="pillar-item">
-      <div class="pillar-num">01 / IDENTITY</div>
-      <div class="pillar-title">Vision</div>
-      <p class="pillar-text">明確なアイデンティティ。ブランドの本質をむき出しにして軸を定め、ブレない基盤を築きます。</p>
-    </div>
-    <div class="pillar-item">
-      <div class="pillar-num">02 / VISUALS</div>
-      <div class="pillar-title">Art</div>
-      <p class="pillar-text">競合に打ち勝つビジュアル。ただ綺麗に整えるのではなく、強い印象と独自の質感を創出します。</p>
-    </div>
-    <div class="pillar-item">
-      <div class="pillar-num">03 / EXPRESSION</div>
-      <div class="pillar-title">Illustration</div>
-      <p class="pillar-text">思考を具現化するための表現。言葉にできない感覚や世界観を、自由なビジュアルへと昇華します。</p>
-    </div>
-  </section>
-
-  <!-- Minimal Footer -->
-  <footer>
-    <div>&copy; HADAKA REPRODUCTION ARCHIVE</div>
-    <div>DESIGNED WITH PURE SIMPLICITY</div>
-  </footer>
+  </div>
 
   <script>
-    const pct = document.getElementById('pctCounter');
+    const cards = document.querySelectorAll('.zoom-card');
+    const heroText = document.getElementById('heroText');
+    const pctCounter = document.getElementById('pctCounter');
+    const scrollHint = document.getElementById('scrollHint');
+
+    // Item တစ်ခုချင်းစီအတွက် 3D Z-Depth သတ်မှတ်ချက်
+    // စုစုပေါင်း အဝေးကြီးကနေ Screen ရှေ့ကို တိုးလာစေမည်
+    const spacing = 1400; // ပုံတစ်ခုနှင့်တစ်ခု အကွာအဝေး
+
     window.addEventListener('scroll', () => {
-      const top = window.scrollY;
-      const h = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = h > 0 ? Math.round((top / h) * 100) : 0;
-      pct.textContent = String(progress).padStart(3, '0') + '%';
+      const scrollY = window.scrollY;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? scrollY / maxScroll : 0;
+
+      // Update Percentage Counter
+      pctCounter.textContent = String(Math.round(progress * 100)).padStart(3, '0') + '%';
+
+      // Hide Scroll Hint
+      if (scrollY > 50) {
+        scrollHint.style.opacity = '0';
+      } else {
+        scrollHint.style.opacity = '1';
+      }
+
+      // 1. Hero Text Zoom Out
+      const heroZ = scrollY * 1.5;
+      const heroOpacity = Math.max(0, 1 - scrollY / 600);
+      heroText.style.transform = `translate3d(0, 0, ${heroZ}px)`;
+      heroText.style.opacity = heroOpacity;
+
+      // 2. 3D Zoom Effect for each Image Card
+      cards.forEach((card, index) => {
+        const x = card.getAttribute('data-x');
+        const y = card.getAttribute('data-y');
+
+        // Initial depth for this card
+        const initialZ = -((index + 1) * spacing);
+        // Current depth calculated from scroll
+        const currentZ = initialZ + (scrollY * 1.4);
+
+        // Opacity and Visibility calculation
+        let opacity = 0;
+
+        // အဝေးကနေ စပေါ်လာမည် (-2500px မှစ၍ fade-in)
+        if (currentZ > -2500 && currentZ < 700) {
+          if (currentZ < -800) {
+            opacity = (currentZ + 2500) / 1700;
+          } else if (currentZ >= -800 && currentZ <= 300) {
+            opacity = 1; // မျက်စိရှေ့တည့်တည့်တွင် အထင်းဆုံးဖြစ်မည်
+          } else {
+            // Screen ကို ဖြတ်ကျော်ပြီး အနောက်ရောက်သွားပါက fade-out ပျောက်ကွယ်သွားမည်
+            opacity = 1 - (currentZ - 300) / 400;
+          }
+        }
+
+        card.style.opacity = Math.max(0, Math.min(1, opacity));
+        card.style.transform = `translate3d(${x}, ${y}, ${currentZ}px)`;
+      });
     });
   </script>
 </body>
