@@ -1,275 +1,260 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Htet Wai Naing Test Website For Khin Khin — MMBS Version</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>ထက်ဝေနိုင် | ခင်ခင်အတွက် စမ်းသပ်ဝက်ဘ်ဆိုက်</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f5f5f7; --text:#050505; --muted:#999; --accent:#ff2a44;
-    --font-mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-    --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Padauk","Myanmar Text",sans-serif;
+    --bg:#f4f4f2; --ink:#000; --mute:#8a8a86; --red:#ff2a44;
+    --sans:"Noto Sans Myanmar","Padauk","Myanmar Text",system-ui,sans-serif;
+    --num:"Space Grotesk",system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{
-    background:var(--bg); color:var(--text); font-family:var(--font-sans);
-    width:100%; overflow-x:hidden; touch-action:pan-y; -webkit-font-smoothing:antialiased;
-  }
-  .scroll-container{position:relative; width:100vw; height:750vh}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);width:100%;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body.locked{overflow:hidden}
+  .scroll-space{height:800vh}
 
-  .mobile-stage{
-    position:fixed; inset:0; overflow:hidden;
-    perspective:1000px; z-index:1;
-  }
+  /* Loader */
+  .loader{position:fixed;inset:0;background:#000;color:#fff;z-index:100;display:flex;align-items:flex-end;justify-content:space-between;padding:1.5rem;transition:transform 1s cubic-bezier(.76,0,.24,1)}
+  .loader.done{transform:translateY(-100%)}
+  .loader .count{font-family:var(--num);font-weight:700;font-size:clamp(5rem,28vw,14rem);line-height:.85;letter-spacing:-.05em}
+  .loader .note{font-size:.8rem;line-height:1.9;max-width:9rem;text-align:right;opacity:.7}
 
-  /* ── HUD ── */
-  .header-ui{
-    position:fixed; top:0; left:0; width:100vw;
-    padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:baseline;
-    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.15em;
-    z-index:50; mix-blend-mode:difference; color:#fff; pointer-events:none;
-    text-transform:uppercase;
-  }
-  .header-ui .brand{
-    font-weight:700; letter-spacing:.2em;
-  }
-  .footer-ui{
-    position:fixed; bottom:0; left:0; width:100vw;
-    padding:1.25rem 1.5rem; display:flex; justify-content:space-between;
-    font-family:var(--font-mono); font-size:.6rem; letter-spacing:.12em;
-    z-index:50; color:var(--muted); pointer-events:none;
-    text-transform:uppercase;
-  }
-  .footer-ui .tag{max-width:50%; line-height:1.5}
-  .footer-ui .tag.right{text-align:right; color:var(--accent)}
+  /* HUD */
+  .hud{position:fixed;left:0;width:100%;padding:1.1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;z-index:50;pointer-events:none;font-size:.8rem}
+  .hud.top{top:0;color:#fff;mix-blend-mode:difference;font-weight:700}
+  .hud.top .pct{font-family:var(--num);font-variant-numeric:tabular-nums}
+  .hud.bottom{bottom:0;color:var(--mute);line-height:1.8}
+  .hud.bottom .r{color:var(--red);text-align:right}
 
-  /* ── Center stack ── */
-  .hero-title, .flow-item{
-    position:absolute;
-    top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    will-change:transform, opacity;
-    pointer-events:none;
-  }
-  .hero-title{ text-align:center; width:90%; z-index:2; }
-  .hero-title h1{
-    font-size:2.4rem; font-weight:900;
-    letter-spacing:-.03em; line-height:1.15; color:var(--text);
-  }
-  .hero-title h1 .accent{color:var(--accent)}
-  .hero-title span{
-    display:block; font-family:var(--font-mono);
-    font-size:.7rem; letter-spacing:.25em; color:var(--muted); margin-top:1.1rem;
-    text-transform:uppercase;
-  }
-  .hero-title .mmbs{
-    display:inline-block; margin-top:.9rem;
-    font-family:var(--font-mono); font-size:.6rem; letter-spacing:.3em;
-    padding:.4rem .8rem; border:1px solid var(--text); border-radius:2px;
-    color:var(--text); text-transform:uppercase;
-  }
+  #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
 
-  /* ── Items ── */
-  .flow-item{
-    width:82vw; max-width:360px;
-    display:flex; flex-direction:column; align-items:flex-start;
-    opacity:0;
-  }
-  .flow-item img{
-    width:100%; height:auto; display:block; object-fit:cover;
-    border-radius:2px;
-    filter:contrast(102%) brightness(98%);
-    box-shadow:0 15px 35px rgba(0,0,0,.06);
-  }
-  .caption-track{
-    width:100%; margin-top:.6rem;
-    display:flex; justify-content:space-between; gap:.5rem;
-    font-family:var(--font-mono); font-size:.6rem;
-    color:var(--text); letter-spacing:.08em; opacity:.85;
-    text-transform:uppercase;
-  }
-  .caption-track .num{color:var(--accent); font-weight:bold; white-space:nowrap}
-  .caption-track .label{text-align:right}
-  .caption-track .sign{
-    display:block; margin-top:.25rem; font-size:.55rem;
-    color:var(--muted); letter-spacing:.15em;
-  }
+  /* Stage */
+  .stage{position:fixed;inset:0;overflow:hidden;z-index:1}
+  .hero,.item,.outro{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);will-change:transform,opacity;pointer-events:none}
+  .hero{width:92%;text-align:center}
+  .hero h1{font-weight:900;font-size:clamp(2.6rem,12vw,7rem);line-height:1.5}
+  .hero h1 em{font-style:normal;color:var(--red);display:block}
+  .hero p{margin-top:1.4rem;font-size:.9rem;color:var(--mute);line-height:1.9}
+  .hero .badge{display:inline-block;margin-top:1rem;padding:.35rem .9rem;border:1.5px solid var(--ink);border-radius:99px;font-size:.8rem;font-weight:700}
+
+  .item{width:82vw;max-width:380px;opacity:0;visibility:hidden}
+  .item .ph{width:100%;aspect-ratio:4/5;background:#dcdcd8;overflow:hidden;border-radius:2px}
+  .item img{width:100%;height:100%;object-fit:cover;display:block}
+  .cap{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-top:.7rem;font-size:.85rem;line-height:1.7}
+  .cap .no{font-family:var(--num);font-weight:700;color:var(--red);white-space:nowrap}
+  .cap .t{text-align:right;font-weight:700}
+  .cap .t small{display:block;font-weight:400;color:var(--mute);font-size:.72rem}
+
+  .outro{width:88%;text-align:center;opacity:0;visibility:hidden}
+  .outro h2{font-weight:900;font-size:clamp(2rem,9vw,4.5rem);line-height:1.6}
+  .outro p{margin-top:1rem;color:var(--mute);font-size:.9rem;line-height:1.9}
+
+  @media (prefers-reduced-motion:reduce){.loader{transition:none}}
 </style>
 </head>
-<body>
+<body class="locked">
 
-<!-- Top HUD -->
-<aside class="header-ui">
-  <span class="brand">Htet Wai Naing</span>
-  <span id="scrollPct">000%</span>
-</aside>
+<div class="loader" id="loader">
+  <div class="count" id="count">0</div>
+  <div class="note">ပုံများကို ဖွင့်နေပါသည်</div>
+</div>
 
-<!-- Bottom HUD -->
-<footer class="footer-ui">
-  <span class="tag">Test Website For Khin Khin</span>
-  <span class="tag right">MMBS Version</span>
-</footer>
+<canvas id="bg" aria-hidden="true"></canvas>
 
-<!-- Stage -->
-<main class="mobile-stage">
+<div class="hud top"><span>ထက်ဝေနိုင်</span><span class="pct" id="pct">0%</span></div>
+<div class="hud bottom"><span>ခင်ခင်အတွက် စမ်းသပ်ဝက်ဘ်ဆိုက်</span><span class="r">မြန်မာဗားရှင်း</span></div>
 
-  <!-- HERO -->
-  <div class="hero-title" id="heroElement">
-    <h1>Htet Wai Naing<br><span class="accent">For Khin Khin</span></h1>
-    <span>Scroll To Explore</span>
-    <span class="mmbs">MMBS Version</span>
+<main class="stage">
+  <div class="hero" id="hero">
+    <h1>ထက်ဝေနိုင်<em>ခင်ခင်အတွက်</em></h1>
+    <p>အောက်သို့ ဆွဲကြည့်ပါ</p>
+    <span class="badge">မြန်မာဗားရှင်း</span>
   </div>
 
-  <!-- 01 -->
-  <div class="flow-item" data-offset-x="-5" data-rotate="-3">
-    <img src="1.jpg" alt="Canopy Light" loading="eager">
-    <div class="caption-track">
-      <span class="num">01 / World</span>
-      <span class="label">Canopy Light<span class="sign">Htet Wai Naing · MMBS</span></span>
-    </div>
-  </div>
+  <div class="item" data-x="-5" data-r="-3"><div class="ph"><img src="1.jpg" alt="သစ်ပင်အောက်က အလင်း"></div>
+    <div class="cap"><span class="no">01</span><span class="t">သစ်ပင်အောက်က အလင်း<small>ကမ္ဘာ · ထက်ဝေနိုင်</small></span></div></div>
+  <div class="item" data-x="5" data-r="2.5"><div class="ph"><img src="2.jpg" alt="ရိုးရာတိတ်ခ်"></div>
+    <div class="cap"><span class="no">02</span><span class="t">ရိုးရာတိတ်ခ်<small>အနုပညာ · ထက်ဝေနိုင်</small></span></div></div>
+  <div class="item" data-x="-6" data-r="-2"><div class="ph"><img src="3.jpg" alt="အလှကို သတိထားမိခြင်း"></div>
+    <div class="cap"><span class="no">03</span><span class="t">အလှကို သတိထားမိခြင်း<small>အမြင် · ထက်ဝေနိုင်</small></span></div></div>
+  <div class="item" data-x="4" data-r="3"><div class="ph"><img src="4.jpg" alt="ဆာဒါ ကောင်းကင်ပေါ်က ကျသည့်ပုံ"></div>
+    <div class="cap"><span class="no">04</span><span class="t">ဆာဒါ၏ ကျဆင်းမှု<small>စီးပွားရေးလုပ်ငန်း · ထက်ဝေနိုင်</small></span></div></div>
+  <div class="item" data-x="-5" data-r="-2.5"><div class="ph"><img src="5.jpg" alt="ဒီဇိုင်းစက်"></div>
+    <div class="cap"><span class="no">05</span><span class="t">ဒီဇိုင်းစက်<small>ဖော်ပြမှု · ထက်ဝေနိုင်</small></span></div></div>
+  <div class="item" data-x="4" data-r="2"><div class="ph"><img src="6.jpg" alt="ပကတိ ပုံတူ"></div>
+    <div class="cap"><span class="no">06</span><span class="t">ပကတိ ပုံတူ<small>ကိုယ်ရည်ကိုယ်သွေး · ထက်ဝေနိုင်</small></span></div></div>
+  <div class="item" data-x="0" data-r="0"><div class="ph"><img src="7.png" alt="နှစ်ဦးလေ့လာချက်"></div>
+    <div class="cap"><span class="no">07</span><span class="t">နှစ်ဦးလေ့လာချက်<small>ဇာတ်လမ်း · ထက်ဝေနိုင်</small></span></div></div>
 
-  <!-- 02 -->
-  <div class="flow-item" data-offset-x="5" data-rotate="2.5">
-    <img src="2.jpg" alt="Ritual Tape" loading="lazy">
-    <div class="caption-track">
-      <span class="num">02 / Art</span>
-      <span class="label">Ritual Tape<span class="sign">Htet Wai Naing · MMBS</span></span>
-    </div>
+  <div class="outro" id="outro">
+    <h2>ကြည့်ပေးလို့<br>ကျေးဇူးတင်ပါတယ်</h2>
+    <p>ထက်ဝေနိုင် · ခင်ခင်အတွက်</p>
   </div>
-
-  <!-- 03 -->
-  <div class="flow-item" data-offset-x="-6" data-rotate="-2">
-    <img src="3.jpg" alt="Noticing Beauty" loading="lazy">
-    <div class="caption-track">
-      <span class="num">03 / Vision</span>
-      <span class="label">Noticing Beauty<span class="sign">Htet Wai Naing · MMBS</span></span>
-    </div>
-  </div>
-
-  <!-- 04 -->
-  <div class="flow-item" data-offset-x="4" data-rotate="3">
-    <img src="4.jpg" alt="Sardor Freefall" loading="lazy">
-    <div class="caption-track">
-      <span class="num">04 / Commercial</span>
-      <span class="label">Sardor Freefall<span class="sign">Htet Wai Naing · MMBS</span></span>
-    </div>
-  </div>
-
-  <!-- 05 -->
-  <div class="flow-item" data-offset-x="-5" data-rotate="-2.5">
-    <img src="5.jpg" alt="Design Machine" loading="lazy">
-    <div class="caption-track">
-      <span class="num">05 / Expression</span>
-      <span class="label">Design Machine<span class="sign">Htet Wai Naing · MMBS</span></span>
-    </div>
-  </div>
-
-  <!-- 06 -->
-  <div class="flow-item" data-offset-x="4" data-rotate="2">
-    <img src="6.jpg" alt="Raw Portrait" loading="lazy">
-    <div class="caption-track">
-      <span class="num">06 / Identity</span>
-      <span class="label">Raw Portrait<span class="sign">Htet Wai Naing · MMBS</span></span>
-    </div>
-  </div>
-
-  <!-- 07 -->
-  <div class="flow-item" data-offset-x="0" data-rotate="0">
-    <img src="7.png" alt="Duo Study" loading="lazy">
-    <div class="caption-track">
-      <span class="num">07 / Narrative</span>
-      <span class="label">Duo Study<span class="sign">Htet Wai Naing · MMBS</span></span>
-    </div>
-  </div>
-
 </main>
 
-<div class="scroll-container"></div>
+<div class="scroll-space"></div>
 
 <script>
 (function(){
-  const items    = Array.from(document.querySelectorAll('.flow-item'));
-  const hero     = document.getElementById('heroElement');
-  const pctLabel = document.getElementById('scrollPct');
+  var items = [].slice.call(document.querySelectorAll('.item'));
+  var hero = document.getElementById('hero');
+  var outro = document.getElementById('outro');
+  var pct = document.getElementById('pct');
+  var loader = document.getElementById('loader');
+  var countEl = document.getElementById('count');
+  var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-  const total  = items.length;
-  const step   = 1 / total;
-  const WINDOW = step * 1.8;   // overlapping timeline (mix effect)
+  var N = items.length, STEP = 0.9 / N, WIN = STEP * 1.8;
+  var cfg = items.map(function(el){ return {el:el, x:+el.dataset.x||0, r:+el.dataset.r||0}; });
+  var clamp = function(v,a,b){ return Math.min(Math.max(v,a),b); };
+  var easeOut = function(t){ return 1 - Math.pow(1 - t, 3); };
 
-  const cfg = items.map(el => ({
-    el,
-    offX: parseFloat(el.dataset.offsetX) || 0,
-    rot:  parseFloat(el.dataset.rotate)  || 0
-  }));
+  /* ── Smooth scroll: lerp toward real scroll position ── */
+  var target = 0, current = 0, last = -1;
+  function readTarget(){
+    var max = document.documentElement.scrollHeight - innerHeight;
+    target = max > 0 ? clamp(scrollY / max, 0, 1) : 0;
+  }
+  addEventListener('scroll', readTarget, {passive:true});
+  addEventListener('resize', readTarget);
 
-  const clamp   = (v,a,b)=>Math.min(Math.max(v,a),b);
-  const easeOut = t=>1-Math.pow(1-t,3);
+  function render(p){
+    pct.textContent = Math.round(p * 100) + '%';
 
-  let ticking = false;
+    var he = clamp(p / 0.1, 0, 1);
+    hero.style.transform = 'translate(-50%,-50%) scale(' + (1 + easeOut(he) * 1.6).toFixed(3) + ')';
+    hero.style.opacity = Math.max(0, 1 - he * 1.2).toFixed(3);
 
-  function update(){
-    ticking = false;
-
-    const scrollY   = window.scrollY || window.pageYOffset;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const progress  = clamp(scrollY / maxScroll, 0, 1);
-
-    pctLabel.textContent = String(Math.round(progress*100)).padStart(3,'0') + '%';
-
-    /* Hero fade & zoom */
-    const heroExit  = clamp(progress / 0.12, 0, 1);
-    const heroScale = 1 + easeOut(heroExit) * 1.6;
-    hero.style.transform = `translate(-50%,-50%) scale(${heroScale.toFixed(3)})`;
-    hero.style.opacity   = Math.max(0, 1 - heroExit * 1.2).toFixed(3);
-
-    /* Items */
-    for (let i = 0; i < total; i++){
-      const c = cfg[i];
-      const start = i * step;
-      const end   = start + WINDOW;
-      const el    = c.el;
-
-      if (progress < start || progress > end){
-        if (el.style.opacity !== '0'){
-          el.style.opacity = '0';
-          el.style.visibility = 'hidden';
-        }
+    for (var i = 0; i < N; i++){
+      var c = cfg[i], s = i * STEP + 0.06, e = s + WIN, el = c.el;
+      if (p < s || p > e){
+        if (el.style.visibility !== 'hidden'){ el.style.visibility = 'hidden'; el.style.opacity = '0'; }
         continue;
       }
-
-      const localP = clamp((progress - start) / (end - start), 0, 1);
-
-      const y   = 75 - localP * 150;                    // +75vh → −75vh
-      const x   = c.offX * (1 - localP * 0.6);
-      const dC  = Math.abs(localP - 0.5) * 2;
-      const sc  = 0.55 + (1 - dC) * 0.65;               // 0.55 → 1.20
-      const rot = c.rot * (1 - localP);
-
-      let opacity;
-      if (localP < 0.18)      opacity = easeOut(localP / 0.18);
-      else if (localP > 0.78) opacity = easeOut((1 - localP) / 0.22);
-      else                    opacity = 1;
-
+      var l = (p - s) / (e - s);
+      var y = 75 - l * 150;
+      var x = c.x * (1 - l * 0.6);
+      var d = Math.abs(l - 0.5) * 2;
+      var sc = 0.55 + (1 - d) * 0.65;
+      var rot = c.r * (1 - l);
+      var o = l < 0.18 ? easeOut(l / 0.18) : l > 0.78 ? easeOut((1 - l) / 0.22) : 1;
       el.style.visibility = 'visible';
-      el.style.opacity    = opacity.toFixed(3);
-      el.style.transform  =
-        `translate(-50%,-50%) ` +
-        `translate3d(${x.toFixed(2)}vw, ${y.toFixed(2)}vh, 0) ` +
-        `rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+      el.style.opacity = o.toFixed(3);
+      el.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(2) + 'vw,' + y.toFixed(2) + 'vh,0) rotate(' + rot.toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
     }
+
+    var oo = clamp((p - 0.93) / 0.07, 0, 1);
+    outro.style.visibility = oo > 0 ? 'visible' : 'hidden';
+    outro.style.opacity = easeOut(oo).toFixed(3);
+    outro.style.transform = 'translate(-50%,-50%) translateY(' + ((1 - easeOut(oo)) * 6).toFixed(2) + 'vh)';
   }
 
-  function onScroll(){
-    if (!ticking){
-      ticking = true;
-      requestAnimationFrame(update);
-    }
+  function tick(){
+    current += (target - current) * (reduce ? 1 : 0.075);
+    if (Math.abs(target - current) < 0.00005) current = target;
+    if (current !== last){ render(current); last = current; }
+    requestAnimationFrame(tick);
   }
 
-  window.addEventListener('scroll', onScroll, { passive:true });
-  window.addEventListener('resize', onScroll);
-  update();
+  /* ── Loader: counts up as images load ── */
+  var imgs = [].slice.call(document.images);
+  var loaded = 0, shown = 0, t0 = performance.now(), MIN = 1400;
+  function mark(){ loaded++; }
+  imgs.forEach(function(im){
+    if (im.complete) mark();
+    else { im.addEventListener('load', mark); im.addEventListener('error', mark); }
+  });
+  function loadTick(){
+    var real = imgs.length ? loaded / imgs.length : 1;
+    var time = clamp((performance.now() - t0) / MIN, 0, 1);
+    var goal = Math.min(real, time) * 100;
+    shown += (goal - shown) * 0.15;
+    countEl.textContent = Math.round(shown);
+    if (shown > 99.4 && real >= 1 && time >= 1){
+      countEl.textContent = '100';
+      setTimeout(function(){
+        loader.classList.add('done');
+        document.body.classList.remove('locked');
+      }, 250);
+      return;
+    }
+    requestAnimationFrame(loadTick);
+  }
+
+  /* ── Looping background: drifting blobs + thunder flashes ── */
+  var cv = document.getElementById('bg'), g = cv.getContext('2d');
+  var W = 0, H = 0, DPR = Math.min(devicePixelRatio || 1, 2);
+  function fit(){
+    W = innerWidth; H = innerHeight;
+    cv.width = W * DPR; cv.height = H * DPR;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  addEventListener('resize', fit); fit();
+
+  var LOOP = 24;                       // seconds per full cycle (seamless)
+  var blobs = [
+    {c:'255,42,68', a:.20, r:.55, fx:1, fy:2, px:0,   py:1.2},
+    {c:'0,0,0',     a:.08, r:.65, fx:2, fy:1, px:2.1, py:0.4},
+    {c:'255,120,90',a:.16, r:.45, fx:1, fy:1, px:4.0, py:3.1},
+    {c:'30,30,60',  a:.10, r:.60, fx:3, fy:2, px:1.0, py:5.0}
+  ];
+  var bolt = null, nextBolt = 2.5, speed = 0, phase = 0, prev = performance.now();
+
+  function makeBolt(){
+    var x = W * (0.15 + Math.random() * 0.7), y = -10, pts = [[x, y]];
+    while (y < H * (0.55 + Math.random() * 0.45)){
+      x += (Math.random() - 0.5) * 70; y += 22 + Math.random() * 38;
+      pts.push([x, y]);
+    }
+    return {pts:pts, born:performance.now()};
+  }
+
+  function drawBg(now){
+    var dt = Math.min((now - prev) / 1000, .05); prev = now;
+    speed += (Math.abs(target - current) * 60 - speed) * 0.08;   // scroll speeds it up
+    phase += dt * (1 + Math.min(speed, 4));
+    var w = (phase % LOOP) / LOOP * Math.PI * 2;
+
+    g.clearRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-over';
+    var S = Math.max(W, H);
+    for (var i = 0; i < blobs.length; i++){
+      var b = blobs[i];
+      var x = W * (.5 + .38 * Math.sin(w * b.fx + b.px));
+      var y = H * (.5 + .38 * Math.cos(w * b.fy + b.py));
+      var gr = g.createRadialGradient(x, y, 0, x, y, S * b.r);
+      gr.addColorStop(0, 'rgba(' + b.c + ',' + b.a + ')');
+      gr.addColorStop(1, 'rgba(' + b.c + ',0)');
+      g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    }
+
+    if (phase > nextBolt){ bolt = makeBolt(); nextBolt = phase + 3 + Math.random() * 3; }
+    if (bolt){
+      var age = (now - bolt.born) / 900;
+      if (age >= 1) bolt = null;
+      else {
+        var al = (age < .12 ? age / .12 : 1 - (age - .12) / .88);
+        if (age > .25 && age < .35) al *= .3;                    // flicker
+        g.strokeStyle = 'rgba(255,42,68,' + (al * .9).toFixed(3) + ')';
+        g.shadowColor = '#ff2a44'; g.shadowBlur = 18; g.lineWidth = 2; g.lineJoin = 'round';
+        g.beginPath();
+        bolt.pts.forEach(function(p, k){ k ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]); });
+        g.stroke(); g.shadowBlur = 0;
+      }
+    }
+    if (!reduce) requestAnimationFrame(drawBg);
+  }
+  requestAnimationFrame(drawBg);
+
+  readTarget(); current = target; render(current);
+  tick();
+  loadTick();
 })();
 </script>
 </body>
